@@ -2,7 +2,7 @@
   "name": "node-red-ros2-plugin",
   "license": "MIT",
   "description": "A collection of Node-RED nodes for connecting with ROS2.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "node": ">=10"
   },
@@ -15,8 +15,7 @@
   },
   "dependencies": {
     "cron": "~1.8.2",
-    "is-web-api": "~1.0.0",
-    "node-red-ros2-plugin": "^1.0.0"
+    "is-web-api": "~1.0.1"
   },
   "devDependencies": {
     "coveralls": "^3.1.0",
