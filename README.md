@@ -1,4 +1,4 @@
-# Node-RED ROS 2 Plugin 
+# Node-RED ROS 2 Plugin
 
 [![License: MIT](https://img.shields.io/github/license/ramp-eu/TTE.project1.svg)](https://opensource.org/licenses/MIT)
 
@@ -54,7 +54,7 @@ These bridges are generated using [Integration-Service](https://integration-serv
 [eProsima](https://www.eprosima.com/) open-source tool.
 
 Using Integration-Service directly from the plugin was possible, but it was considered a better choice to create another
-Node.js library ([IS-Web-API](https://github.com/eProsima/IS-Web-API), to abstract the bridge operation. This way:
+Node.js library ([is-web-api](https://github.com/eProsima/is-web-api), to abstract the bridge operation. This way:
  + The plugin can rely on any other bridge technology.
  + Development is simplified by enforcing separation of concerns.
  + Any other Node.js project (besides the plugin) can profit from the bridge library.
@@ -200,7 +200,7 @@ In order the publish or subscribe data we need first to specify the associated t
         <td width="250"><img name="IDL Type" src="./docs/IDLType.png" height="auto"></td>
         <td> This node represents a type defined by means of an IDL.
              IDL is a language that allows unambiguous specification of the interfaces that may be used to define the
-             data types. 
+             data types.
         </td>
     </tr>
     <tr>
@@ -381,7 +381,7 @@ In this case, a builtin ROS2 type (`geometry_msgs/Point`) will be used.
 1. Launch docker compose as explained [here](./docker/README.md).
 1. Create and wire the following nodes:
     + A `ROS2 Type` node. Open the associated dialog and select:
-        
+
         `Package`
         : geometry_msgs
 
@@ -552,7 +552,7 @@ Let's use a custom type.
         `Context Broker`
         : `192.168.42.14:1026`
 
-      Note the address and port of the Context Broker was specified in the `compose.yaml` file. 
+      Note the address and port of the Context Broker was specified in the `compose.yaml` file.
 
     + A `ROS Inject` node. Open the associated dialog and fill in the fields:
 
@@ -602,7 +602,7 @@ In this case, a builtin ROS2 type (`geometry_msgs/Point`) will be used.
 1. Launch docker compose as explained [here](./docker/README.md).
 1. Create and wire the following nodes:
     + A `ROS2 Type` node. Open the associated dialog and select:
-        
+
         `Package`
         : geometry_msgs
 
@@ -635,7 +635,7 @@ $ curl http://localhost:1026/v2/entities -H 'Content-Type: application/json' -d 
     "type": "geometry_msgs::msg::Point",
     "x": {"value": 42, "type":"Text"},
     "y": {"value": 4, "type":"Text"},
-    "z": {"value": 2, "type":"Text"} 
+    "z": {"value": 2, "type":"Text"}
 }
 EOF
 ```
@@ -648,7 +648,7 @@ $ curl -X PUT http://localhost:1026/v2/entities/position/attrs?type=geometry_msg
 {
     "x": {"value": 3, "type":"Text"},
     "y": {"value": 2, "type":"Text"},
-    "z": {"value": 1, "type":"Text"} 
+    "z": {"value": 1, "type":"Text"}
 }
 EOF
 ```

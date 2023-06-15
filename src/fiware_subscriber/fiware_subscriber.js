@@ -1,6 +1,6 @@
 module.exports = function(RED) {
 
-    var is_web_api = require('IS-Web-API').fiware;
+    var is_web_api = require('is-web-api').fiware;
 
     /*
      * @function SubscriberNode constructor
@@ -62,7 +62,7 @@ module.exports = function(RED) {
                 });
             }
         });
-        
+
         node.on('close', function(removed, done) {
 
             // Stops the IS execution and resets the yaml

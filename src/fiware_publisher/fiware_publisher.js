@@ -1,6 +1,6 @@
 module.exports = function(RED) {
 
-    var is_web_api = require('IS-Web-API').fiware;
+    var is_web_api = require('is-web-api').fiware;
 
     /*
      * @function PublisherNode constructor
@@ -74,7 +74,7 @@ module.exports = function(RED) {
                done("node was not ready to process flow data");
             }
         });
-        
+
         node.on('close', function(removed, done) {
 
             // Stops the IS execution and resets the yaml

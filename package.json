@@ -1,19 +1,22 @@
 {
-  "name": "node-red-contrib-ros2-plugin",
+  "name": "node-red-ros2-plugin",
   "license": "MIT",
   "description": "A collection of Node-RED nodes for connecting with ROS2.",
   "version": "1.0.0",
   "engines": {
     "node": ">=10"
   },
-  "os" : ["!win32"],
+  "os": [
+    "!win32"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/eProsima/node-red-ros2-plugin.git"
   },
   "dependencies": {
     "cron": "~1.8.2",
-    "is-web-api": "~1.0.0"
+    "is-web-api": "~1.0.0",
+    "node-red-ros2-plugin": "^1.0.0"
   },
   "devDependencies": {
     "coveralls": "^3.1.0",

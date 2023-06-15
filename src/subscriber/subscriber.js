@@ -5,7 +5,7 @@ module.exports = function(RED)
 {
     var events = require('events');
     var fs = require('fs');
-    var is_web_api = require('IS-Web-API').ros2;
+    var is_web_api = require('is-web-api').ros2;
     /*
      * @function SubscriberNode constructor
      * This node is defined by the constructor function SubscriberNode,

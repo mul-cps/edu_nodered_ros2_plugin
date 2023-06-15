@@ -38,19 +38,9 @@ WORKDIR /is_ws
 RUN . /opt/ros/$ROS_DISTRO/setup.sh && \
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=DEBUG -DIS_ROS2_SH_MODE=DYNAMIC --install-base /opt/is
 
-# Install IS-Web-API
-RUN mkdir -p /iswebapi_ws/
-WORKDIR /iswebapi_ws/
-RUN git clone https://github.com/eProsima/IS-Web-API.git
-WORKDIR /usr/lib
-RUN npm install -g /iswebapi_ws/IS-Web-API
-
 # Install node-red-plugin
-RUN mkdir -p /nodered_ws/src
-WORKDIR /nodered_ws/src
-RUN git clone https://github.com/eProsima/node-red-ros2-plugin.git
 WORKDIR /usr/lib
-RUN npm install -g /nodered_ws/src/node-red-ros2-plugin
+RUN npm install -g node-red-ros2-plugin
 
 # Enable overlay execution
 RUN printf '#!/bin/bash\n set -e\n \n # setup ros2 environment\n source "/opt/is/setup.sh" --\n NODE_PATH=/usr/lib/node_modules exec "$@"' > /node_entrypoint.sh \
