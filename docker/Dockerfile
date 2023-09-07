@@ -48,7 +48,8 @@ RUN source /opt/ros/$ROS_DISTRO/setup.bash \
     && npm install -g --unsafe-perm \
         node-red \
         rclnodejs \
-        cron
+        cron \
+        is-web-api
 
 # Coping and Installing ROS2 Plugin
 COPY ./ /home/user/node-red-ros2-plugin

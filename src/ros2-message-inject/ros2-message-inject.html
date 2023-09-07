@@ -150,7 +150,12 @@
     var custom_struct = {};
 
     function processIDL(idl_str, pkg, msg, node, n) {
-
+        console.log("processIDL");
+        console.log(idl_str);
+        console.log(pkg);
+        console.log(msg);
+        console.log(node);
+        console.log(n);
         var params = {};
         var type_name = "";
         var complete_name = "";
@@ -167,13 +172,20 @@
             params['msg'] = msg;
             type_name = n.target.ros2message;
             complete_name = n.target.ros2pkg + "::msg::" + n.target.ros2message;
+            console.log("complete_name");
+            console.log(complete_name);
         }
 
         $.getJSON('getidl', params, function(idl)
         {
+            console.log("getJSON");
+            console.log(params);
+            console.log(idl);
             //Array [[ 0: Struct name, 1: { member: type }], ...]
             idl.forEach( function(struct)
             {
+                console.log("idl.forEach");
+                console.log(struct);
                 if (struct[0] != type_name || !Object.keys(custom_struct).includes(struct[0]))
                 {
                     custom_struct[struct[0]] = [];
@@ -456,11 +468,14 @@
             // Checks each link connected to this node
             RED.nodes.eachLink( function(n)
             {
+                console.log("each link");
                 if (n.source.id == node.id)
                 {
                     switch(n.target.type)
                     {
                         case "ROS2 Type":
+                            console.log(n.target.ros2pkg);
+                            console.log(n.target.ros2message);
                             if (n.target.validationErrors.length > 0)
                             {
                                 RED.notify("The type must be configured before", "error");

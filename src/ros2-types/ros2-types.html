@@ -69,7 +69,9 @@
         oneditprepare: function()
         {
             var node = this;
-
+            console.log("oneditprepare");
+            console.log(this.ros2pkg);
+            console.log(this.ros2message);
             if (this.ros2pkg)
             {
                 $("#node-input-ros2package-select").empty();
@@ -230,6 +232,9 @@
 
             node.ros2pkg = $("#node-input-ros2package-select").val().toString();
             node.ros2message = $("#node-input-ros2msg-select").val().toString();
+            console.log("oneditsave");
+            console.log(node.ros2pkg);
+            console.log(node.ros2message);
 
             $("#node-input-ros2pkg").val(node.ros2pkg);
             $("#node-input-ros2message").val(node.ros2message);

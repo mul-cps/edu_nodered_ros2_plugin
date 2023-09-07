@@ -11,7 +11,7 @@ module.exports = function(RED)
     {
         ros2_home = process.env.IS_ROS2_PATH;
     }
-    // var is_web_api = require('is-web-api').ros2;
+    var is_web_api = require('is-web-api').ros2;
 
     /*
      * @function ROS2InjectNode constructor
@@ -65,15 +65,15 @@ module.exports = function(RED)
             node.repeaterSetup();
         }
 
-        // var event_emitter = is_web_api.get_event_emitter();
-        // if (event_emitter)
-        // {
-        //     // Event emitted if the integration server failed
-        //     event_emitter.on('IS-ERROR', function(status)
-        //     {
-        //         node.status(status);
-        //     });
-        // }
+        var event_emitter = is_web_api.get_event_emitter();
+        if (event_emitter)
+        {
+            // Event emitted if the integration server failed
+            event_emitter.on('IS-ERROR', function(status)
+            {
+                node.status(status);
+            });
+        }
 
         this.on("input", function(msg, send, done) {
             var errors = [];
@@ -174,6 +174,7 @@ module.exports = function(RED)
     // Function that returns the IDL associated with the selected message type
     RED.httpAdmin.get("/getidl", RED.auth.needsPermission("ROS2 Inject.write"), function(req,res)
     {
+        console.log("DA GENAU HIER!");
         var idl = "";
         if (req.query['idl'])
         {
@@ -187,12 +188,14 @@ module.exports = function(RED)
         }
 
         var type_dict = {};
-
+        console.log("idl string:");
+        console.log(idl);
         // Executes the xtypes command line validator to get the type members
         execFile("xtypes_idl_validator", [String(idl)], function(error, stdout, stderr) {
             // Defined Structure Position
+
             stdout = stdout.substr(stdout.indexOf('Struct Name:'));
-            console.log(stdout);
+            console.log("stdout: ${stdout}");
             var occurences = locations('Struct Name:', stdout);
 
             var i = 0;
