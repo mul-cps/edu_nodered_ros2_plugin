@@ -1,8 +1,10 @@
 ARG ROS_DISTRO=humble
 
 FROM eprosima/vulcanexus:$ROS_DISTRO
+# FROM eduartrobotik/eduart-ros-base:humble-1.2.0
 
 # Avoid interactuation with installation of some package that needs the locale.
+USER root
 ENV TZ=Europe/Madrid
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
@@ -29,35 +31,36 @@ RUN apt-get update && \
         libwebsocketpp-dev \
         libyaml-cpp-dev \
         python3-pip \
+        ros-$ROS_DISTRO-rmw-fastrtps-cpp \
+        ros-$ROS_DISTRO-fastrtps \
         wget && \
     pip3 install -U \
         colcon-common-extensions \
         vcstool && \
-    curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.bash && \
+    curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.bash && \
     chmod +x nodesource_setup.bash && \
     bash -c ./nodesource_setup.bash && \
     apt-get install -y nodejs
 
-# Install eProsima Integration Service
-WORKDIR /is_ws
-RUN mkdir src && cd src && \
-    git clone https://github.com/eProsima/Integration-Service.git is && \
-    git clone https://github.com/eProsima/WebSocket-SH.git && \
-    git clone https://github.com/eProsima/ROS2-SH.git && \
-    git clone https://github.com/eProsima/FIWARE-SH.git && \
-    source /opt/vulcanexus/$ROS_DISTRO/setup.bash && \
-    colcon build --cmake-args -DIS_ROS2_SH_MODE=DYNAMIC --install-base /opt/is
 
 # Install Node-RED and node-red-ros2-plugin
-RUN npm install -g --unsafe-perm \
+RUN source /opt/ros/$ROS_DISTRO/setup.bash \
+    && npm install -g --unsafe-perm \
         node-red \
-        node-red-ros2-plugin \
-        node-red-contrib-keypress
+        rclnodejs \
+        cron
+
+# Coping and Installing ROS2 Plugin
+COPY ./ /home/user/node-red-ros2-plugin
+RUN echo "installing ROS2 plugin" \
+    && cd /home/user/ \
+    && npm install -g ./node-red-ros2-plugin
 
 # Enable overlay execution
 WORKDIR /
-COPY entrypoint.bash .
+COPY ./docker/entrypoint.bash .
 RUN chmod +x /entrypoint.bash
 
-CMD [ "node", "/usr/bin/node-red" ]
+# CMD [ "node", "/usr/bin/node-red" ]
+CMD /usr/bin/node-red
 ENTRYPOINT [ "/entrypoint.bash" ]

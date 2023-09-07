@@ -3,7 +3,7 @@ module.exports = function(RED)
 {
     var fs = require('fs');
     var path = require('path');
-    var is_web_api = require('is-web-api').ros2;
+    // var is_web_api = require('is-web-api').ros2;
     var home = process.env.HOME;
     var ros2_home = '/opt/ros/' + process.env.ROS_DISTRO;
     if (process.env.IS_ROS2_PATH)
@@ -26,19 +26,19 @@ module.exports = function(RED)
         RED.nodes.createNode(this, config);
         var node = this;
 
-        let {color, message} = is_web_api.add_ros2_type(config.ros2pkg, config.ros2message, config.wires[0]);
-        if (message && color)
-        {
-            node.status({ fill: color, shape: "dot", text: message});
-            node.emit("error", message);
-        }
+        // let {color, message} = is_web_api.add_ros2_type(config.ros2pkg, config.ros2message, config.wires[0]);
+        // if (message && color)
+        // {
+        //     node.status({ fill: color, shape: "dot", text: message});
+        //     node.emit("error", message);
+        // }
 
         // Event emitted when the deploy is finished
         RED.events.once("flows:started", function() {
-            let {color, message} = is_web_api.launch(config['id']);
-            if (message && color)
+            // let {color, message} = is_web_api.launch(config['id']);
+            // if (message && color)
             {
-                node.status({ fill: color, shape: "dot", text: message});
+                node.status({ fill: "green", shape: "dot", text: "running"});
             }
         });
 
@@ -54,7 +54,7 @@ module.exports = function(RED)
         node.on('close', function()
         {
             // Stops the IS execution and resets the yaml
-            is_web_api.stop();
+            // is_web_api.stop();
         });
     }
 

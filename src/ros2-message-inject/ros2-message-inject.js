@@ -11,7 +11,7 @@ module.exports = function(RED)
     {
         ros2_home = process.env.IS_ROS2_PATH;
     }
-    var is_web_api = require('is-web-api').ros2;
+    // var is_web_api = require('is-web-api').ros2;
 
     /*
      * @function ROS2InjectNode constructor
@@ -65,15 +65,15 @@ module.exports = function(RED)
             node.repeaterSetup();
         }
 
-        var event_emitter = is_web_api.get_event_emitter();
-        if (event_emitter)
-        {
-            // Event emitted if the integration server failed
-            event_emitter.on('IS-ERROR', function(status)
-            {
-                node.status(status);
-            });
-        }
+        // var event_emitter = is_web_api.get_event_emitter();
+        // if (event_emitter)
+        // {
+        //     // Event emitted if the integration server failed
+        //     event_emitter.on('IS-ERROR', function(status)
+        //     {
+        //         node.status(status);
+        //     });
+        // }
 
         this.on("input", function(msg, send, done) {
             var errors = [];

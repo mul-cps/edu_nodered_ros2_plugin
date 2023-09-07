@@ -2,7 +2,8 @@
 module.exports = function(RED)
 {
     var fs = require('fs');
-    var is_web_api = require('is-web-api').ros2;
+    // var is_web_api = require('is-web-api').ros2;
+    var ros_node = require('../ros2/ros2-instance');
     /*
      * @function PublisherNode constructor
      * This node is defined by the constructor function PublisherNode,
@@ -12,7 +13,7 @@ module.exports = function(RED)
      */
     function PublisherNode(config)
     {
-        // Initiliaze the features shared by all nodes
+        // Initialize the features shared by all nodes
         RED.nodes.createNode(this, config);
         this.props = config.props;
         var node = this;
@@ -24,40 +25,55 @@ module.exports = function(RED)
         {
             // modify the global domain
             var selected_domain = RED.nodes.getNode(config.domain).domain;
-            is_web_api.set_dds_domain(selected_domain);
+            // is_web_api.set_dds_domain(selected_domain);
+            // \todo handle domain ID
         }
 
-        let {color, message} = is_web_api.add_publisher(config['id'], config['topic'], config['selectedtype'], config['props']);
-        if (message && color)
-        {
-            node.status({ fill: color, shape: "dot", text: message});
+        // Creating Publisher
+        try {
+            console.log("creating publisher...");
+            // this.publisher = ros_node.node.createPublisher(config['selectedtype'], config['topic'], config['props']);
+            this.publisher = ros_node.node.createPublisher('std_msgs/msg/String', 'string');
+            node.ready = true;
+            node.status({ fill: "yellow", shape: "dot", text: "created"});
         }
+        catch (error) {
+            console.log("creating publisher failed");
+            console.log(error);
+            node.ready = false;
+            node.status({ fill: "red", shape: "dot", text: "error"});
+        }
+        // let {color, message} = is_web_api.add_publisher(config['id'], config['topic'], config['selectedtype'], config['props']);
+        // if (message && color)
+        // {
+        //     node.status({ fill: color, shape: "dot", text: message});
+        // }
 
         // Event emitted when the deploy is finished
         RED.events.once('flows:started', function()
         {
-            let {color, message} = is_web_api.launch(config['id']);
-            if (message && color)
+            // let {color, message} = is_web_api.launch(config['id']);
+            // if (message && color)
             {
-                node.status({ fill: color, shape: "dot", text: message});
+                node.status({ fill: "green", shape: "dot", text: "running"});
             }
         });
 
-        var event_emitter = is_web_api.get_event_emitter();
-        if (event_emitter)
-        {
-            event_emitter.on('IS-ERROR', function(status)
-            {
-                node.ready = false;
-                node.status(status);
-            });
+        // var event_emitter = is_web_api.get_event_emitter();
+        // if (event_emitter)
+        // {
+        //     event_emitter.on('IS-ERROR', function(status)
+        //     {
+        //         node.ready = false;
+        //         node.status(status);
+        //     });
 
-            event_emitter.on('ROS2_connected', function()
-            {
-                node.ready = true;
-                node.status({ fill: null, shape: null, text: null});
-            });
-        }
+        //     event_emitter.on('ROS2_connected', function()
+        //     {
+        //         node.ready = true;
+        //         node.status({ fill: null, shape: null, text: null});
+        //     });
+        // }
 
         // Registers a listener to the input event,
         // which will be called whenever a message arrives at this node
@@ -68,8 +84,11 @@ module.exports = function(RED)
                 node.status({ fill: "green", shape: "dot", text: "Message Published"});
 
                 // Passes the message to the next node in the flow
+                console.log("received on input:");
+                console.log(msg);
                 node.send(msg);
-                is_web_api.send_message(config['topic'], msg);
+                this.publisher.publish(msg.payload);
+                // is_web_api.send_message(config['topic'], msg);
             }
             else
             {
@@ -81,8 +100,8 @@ module.exports = function(RED)
         node.on('close', function()
         {
             // Stops the IS execution and resets the yaml
-            is_web_api.new_config();
-            is_web_api.stop();
+            // is_web_api.new_config();
+            // is_web_api.stop();
             node.status({ fill: null, shape: null, text: ""});
         });
     }
