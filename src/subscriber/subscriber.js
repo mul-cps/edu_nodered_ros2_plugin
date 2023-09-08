@@ -1,10 +1,59 @@
 const { send } = require('process');
+const ros_node = require('../ros2/ros2-instance');
+const rclnodejs = require("rclnodejs");
+
+function get_qos_from_props (config)
+{
+    var qos = { "qos": {}};
+    config.forEach( function(q) {
+        var pos = q.p.indexOf('.');
+        if (pos != -1) {
+            var qos_type = q.p.substr(0, pos);
+            var param = q.p.substr(pos + 1);
+
+            if (!Object.keys(qos["qos"]).includes(qos_type)) {
+                qos["qos"][qos_type] = {};
+            }
+
+            pos = param.indexOf('.');
+
+            if (pos != -1) {
+                param = param.substr(pos + 1);
+            }
+
+            qos["qos"][qos_type][param] = q.v;
+        }
+        else
+        {
+            qos["qos"][q.p] = q.v;
+        }
+    });
+
+    qos_mapped = new rclnodejs.QoS();
+    if (qos['qos']['history'] != undefined && qos['qos']['history']['kind'] != undefined) {
+        qos_mapped.history = rclnodejs.QoS.HistoryPolicy['RMW_QOS_POLICY_HISTORY_' + qos['qos']['history']['kind']];
+    }
+    if (qos['qos']['reliability'] != undefined) {
+        qos_mapped.reliability = rclnodejs.QoS.ReliabilityPolicy['RMW_QOS_POLICY_RELIABILITY_' + qos['qos']['reliability']];
+    }
+    if (qos['qos']['durability'] != undefined) {
+        qos_mapped.durability = rclnodejs.QoS.DurabilityPolicy['RMW_QOS_POLICY_DURABILITY_' +  qos['qos']['durability']];
+    }
+    if (qos['qos']['history'] != undefined && qos['qos']['history']['depth'] != undefined) {
+        qos_mapped.depth = Number(qos['qos']['history']['depth']);
+    }
+    else {
+        qos_mapped.depth = 2;
+    }
+
+    return qos_mapped;
+};
+
 
 // RED argument provides the module access to Node-RED runtime api
 module.exports = function(RED)
 {
     var fs = require('fs');
-    var ros_node = require('../ros2/ros2-instance');
     /*
      * @function SubscriberNode constructor
      * This node is defined by the constructor function SubscriberNode,
@@ -30,10 +79,13 @@ module.exports = function(RED)
             console.log("creating subscription...");
             console.log("type:")
             console.log(config['selectedtype']);
-            console.log("uses following props:")
-            console.log(config['props']);
+
+            qos = get_qos_from_props(config['props']);
+            console.log("uses following QoS:")
+            console.log(qos);
+
             this.subscription = ros_node.node.createSubscription(
-                config['selectedtype'], config['topic'], config['props'], function(msg) {
+                config['selectedtype'], config['topic'], { qos }, function(msg) {
                     // Callback Function for Receiving a ROS Message
                     node.status({ fill: "green", shape: "dot", text: "message received" });
                     // Passes the message to the next node in the flow
@@ -61,6 +113,8 @@ module.exports = function(RED)
 
         // Called when there is a re-deploy or the program is closed
         node.on('close', function() {
+            ros_node.node.destroySubscription(this.subscription);
+            this.subscription = null;
             node.status({ fill: null, shape: null, text: ""});
         });
     }

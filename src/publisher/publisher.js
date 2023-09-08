@@ -1,21 +1,21 @@
+const rclnodejs = require("rclnodejs");
+
 function get_qos_from_props (config)
 {
     var qos = { "qos": {}};
-    config.forEach( function(q)
-    {
+    config.forEach( function(q) {
         var pos = q.p.indexOf('.');
-        if (pos != -1)
-        {
+        if (pos != -1) {
             var qos_type = q.p.substr(0, pos);
             var param = q.p.substr(pos + 1);
-            if (!Object.keys(qos["qos"]).includes(qos_type))
-            {
+
+            if (!Object.keys(qos["qos"]).includes(qos_type)) {
                 qos["qos"][qos_type] = {};
             }
 
             pos = param.indexOf('.');
-            if (pos != -1)
-            {
+
+            if (pos != -1) {
                 param = param.substr(pos + 1);
             }
 
@@ -27,7 +27,24 @@ function get_qos_from_props (config)
         }
     });
 
-    return qos;
+    qos_mapped = new rclnodejs.QoS();
+    if (qos['qos']['history'] != undefined && qos['qos']['history']['kind'] != undefined) {
+        qos_mapped.history = rclnodejs.QoS.HistoryPolicy['RMW_QOS_POLICY_HISTORY_' + qos['qos']['history']['kind']];
+    }
+    if (qos['qos']['reliability'] != undefined) {
+        qos_mapped.reliability = rclnodejs.QoS.ReliabilityPolicy['RMW_QOS_POLICY_RELIABILITY_' + qos['qos']['reliability']];
+    }
+    if (qos['qos']['durability'] != undefined) {
+        qos_mapped.durability = rclnodejs.QoS.DurabilityPolicy['RMW_QOS_POLICY_DURABILITY_' +  qos['qos']['durability']];
+    }
+    if (qos['qos']['history'] != undefined && qos['qos']['history']['depth'] != undefined) {
+        qos_mapped.depth = Number(qos['qos']['history']['depth']);
+    }
+    else {
+        qos_mapped.depth = 2;
+    }
+
+    return qos_mapped;
 };
 
 
@@ -36,8 +53,7 @@ module.exports = function(RED)
 {
     var fs = require('fs');
     // var is_web_api = require('is-web-api').ros2;
-    var ros_node = require('../ros2/ros2-instance');
-    var rclnodejs = require("rclnodejs");    
+    var ros_node = require('../ros2/ros2-instance');  
     /*
      * @function PublisherNode constructor
      * This node is defined by the constructor function PublisherNode,
@@ -57,7 +73,6 @@ module.exports = function(RED)
         if(config.domain) {
             // modify the global domain
             var selected_domain = RED.nodes.getNode(config.domain).domain;
-            // is_web_api.set_dds_domain(selected_domain);
         }
 
         // Creating Publisher
@@ -65,39 +80,12 @@ module.exports = function(RED)
             console.log("creating publisher...");
             console.log("type:")
             console.log(config['selectedtype']);
-            console.log("uses following props:")
-            // qos = Object.assign(new rclnodejs.QoS, get_qos_from_props(config['props'])['qos']);
-            qos_struct = get_qos_from_props(config['props']);
-            qos = new rclnodejs.QoS();
-            if (qos_struct['qos']['history']['kind'] != undefined) {
-                qos.history = rclnodejs.QoS.HistoryPolicy['RMW_QOS_POLICY_HISTORY_' + qos_struct['qos']['history']['kind']];
-            }
-            if (qos_struct['qos']['reliability'] != undefined) {
-                qos.reliability = rclnodejs.QoS.ReliabilityPolicy['RMW_QOS_POLICY_RELIABILITY_' + qos_struct['qos']['reliability']];
-            }
-            if (qos_struct['qos']['durability'] != undefined) {
-                qos.durability = rclnodejs.QoS.DurabilityPolicy['RMW_QOS_POLICY_DURABILITY_' +  qos_struct['qos']['durability']];
-            }
-            if (qos_struct['qos']['history']['depth'] != undefined) {
-                console.log(qos_struct['qos']['history']['depth']);
-                qos.depth = Number(qos_struct['qos']['history']['depth']);
-            }
-            else {
-                qos.depth = 2;
-            }
 
-            // console.log(qos_struct);
-            // console.log(qos_struct['qos']['reliability']);
-            // qos = new rclnodejs.QoS(
-            //     rclnodejs.HistoryPolicy['RMW_QOS_POLICY_HISTORY_' + qos_struct['qos']['history']],
-            //     qos_struct['qos']['depth'],
-            //     rclnodejs.ReliabilityPolicy['RMW_QOS_POLICY_RELIABILITY_' + qos_struct['qos']['reliability']],
-            //     rclnodejs.DurabilityPolicy['RMW_QOS_POLICY_DURABILITY_' +  qos_struct['qos']['durability']]
-            // );
-            console.log("resulting qos");
+            qos = get_qos_from_props(config['props']);
+            console.log("uses following QoS:")
             console.log(qos);
+
             this.publisher = ros_node.node.createPublisher(config['selectedtype'], config['topic'], {qos});
-            console.log(this.publisher);
             node.ready = true;
             node.status({ fill: "yellow", shape: "dot", text: "created"});
             console.log("publisher was created successfully");            
@@ -131,6 +119,8 @@ module.exports = function(RED)
 
         // Called when there is a re-deploy or the program is closed
         node.on('close', function() {
+            ros_node.node.destroyPublisher(this.publisher);
+            this.publish = null;
             node.status({ fill: null, shape: null, text: ""});
         });
     }
