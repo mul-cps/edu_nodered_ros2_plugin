@@ -1,9 +1,43 @@
+function get_qos_from_props (config)
+{
+    var qos = { "qos": {}};
+    config.forEach( function(q)
+    {
+        var pos = q.p.indexOf('.');
+        if (pos != -1)
+        {
+            var qos_type = q.p.substr(0, pos);
+            var param = q.p.substr(pos + 1);
+            if (!Object.keys(qos["qos"]).includes(qos_type))
+            {
+                qos["qos"][qos_type] = {};
+            }
+
+            pos = param.indexOf('.');
+            if (pos != -1)
+            {
+                param = param.substr(pos + 1);
+            }
+
+            qos["qos"][qos_type][param] = q.v;
+        }
+        else
+        {
+            qos["qos"][q.p] = q.v;
+        }
+    });
+
+    return qos;
+};
+
+
 // RED argument provides the module access to Node-RED runtime api
 module.exports = function(RED)
 {
     var fs = require('fs');
     // var is_web_api = require('is-web-api').ros2;
     var ros_node = require('../ros2/ros2-instance');
+    var rclnodejs = require("rclnodejs");    
     /*
      * @function PublisherNode constructor
      * This node is defined by the constructor function PublisherNode,
@@ -19,23 +53,54 @@ module.exports = function(RED)
         var node = this;
         node.ready = false;
 
-        node.status({fill: "yellow", shape: "dot", text: "Wait until Visual-ROS is ready to be used."});
-
-        if(config.domain)
-        {
+        // \todo handle domain id differently
+        if(config.domain) {
             // modify the global domain
             var selected_domain = RED.nodes.getNode(config.domain).domain;
             // is_web_api.set_dds_domain(selected_domain);
-            // \todo handle domain ID
         }
 
         // Creating Publisher
         try {
             console.log("creating publisher...");
-            // this.publisher = ros_node.node.createPublisher(config['selectedtype'], config['topic'], config['props']);
-            this.publisher = ros_node.node.createPublisher(config['selectedtype'], config['topic']);
+            console.log("type:")
+            console.log(config['selectedtype']);
+            console.log("uses following props:")
+            // qos = Object.assign(new rclnodejs.QoS, get_qos_from_props(config['props'])['qos']);
+            qos_struct = get_qos_from_props(config['props']);
+            qos = new rclnodejs.QoS();
+            if (qos_struct['qos']['history']['kind'] != undefined) {
+                qos.history = rclnodejs.QoS.HistoryPolicy['RMW_QOS_POLICY_HISTORY_' + qos_struct['qos']['history']['kind']];
+            }
+            if (qos_struct['qos']['reliability'] != undefined) {
+                qos.reliability = rclnodejs.QoS.ReliabilityPolicy['RMW_QOS_POLICY_RELIABILITY_' + qos_struct['qos']['reliability']];
+            }
+            if (qos_struct['qos']['durability'] != undefined) {
+                qos.durability = rclnodejs.QoS.DurabilityPolicy['RMW_QOS_POLICY_DURABILITY_' +  qos_struct['qos']['durability']];
+            }
+            if (qos_struct['qos']['history']['depth'] != undefined) {
+                console.log(qos_struct['qos']['history']['depth']);
+                qos.depth = Number(qos_struct['qos']['history']['depth']);
+            }
+            else {
+                qos.depth = 2;
+            }
+
+            // console.log(qos_struct);
+            // console.log(qos_struct['qos']['reliability']);
+            // qos = new rclnodejs.QoS(
+            //     rclnodejs.HistoryPolicy['RMW_QOS_POLICY_HISTORY_' + qos_struct['qos']['history']],
+            //     qos_struct['qos']['depth'],
+            //     rclnodejs.ReliabilityPolicy['RMW_QOS_POLICY_RELIABILITY_' + qos_struct['qos']['reliability']],
+            //     rclnodejs.DurabilityPolicy['RMW_QOS_POLICY_DURABILITY_' +  qos_struct['qos']['durability']]
+            // );
+            console.log("resulting qos");
+            console.log(qos);
+            this.publisher = ros_node.node.createPublisher(config['selectedtype'], config['topic'], {qos});
+            console.log(this.publisher);
             node.ready = true;
             node.status({ fill: "yellow", shape: "dot", text: "created"});
+            console.log("publisher was created successfully");            
         }
         catch (error) {
             console.log("creating publisher failed");
@@ -43,62 +108,29 @@ module.exports = function(RED)
             node.ready = false;
             node.status({ fill: "red", shape: "dot", text: "error"});
         }
-        // let {color, message} = is_web_api.add_publisher(config['id'], config['topic'], config['selectedtype'], config['props']);
-        // if (message && color)
-        // {
-        //     node.status({ fill: color, shape: "dot", text: message});
-        // }
 
         // Event emitted when the deploy is finished
-        RED.events.once('flows:started', function()
-        {
-            // let {color, message} = is_web_api.launch(config['id']);
-            // if (message && color)
-            {
-                node.status({ fill: "green", shape: "dot", text: "running"});
-            }
+        RED.events.once('flows:started', function() {
+            node.status({ fill: "green", shape: "dot", text: "waiting to publish message"});
         });
-
-        // var event_emitter = is_web_api.get_event_emitter();
-        // if (event_emitter)
-        // {
-        //     event_emitter.on('IS-ERROR', function(status)
-        //     {
-        //         node.ready = false;
-        //         node.status(status);
-        //     });
-
-        //     event_emitter.on('ROS2_connected', function()
-        //     {
-        //         node.ready = true;
-        //         node.status({ fill: null, shape: null, text: null});
-        //     });
-        // }
 
         // Registers a listener to the input event,
         // which will be called whenever a message arrives at this node
-        node.on('input', function(msg)
-        {
-            if (node.ready)
-            {
-                node.status({ fill: "green", shape: "dot", text: "Message Published"});
+        node.on('input', function(msg) {
+            if (node.ready) {
+                node.status({ fill: "green", shape: "dot", text: "message published"});
 
                 // Passes the message to the next node in the flow
                 node.send(msg);
                 this.publisher.publish(msg);
             }
-            else
-            {
+            else {
                done("node was not ready to process flow data");
             }
         });
 
         // Called when there is a re-deploy or the program is closed
-        node.on('close', function()
-        {
-            // Stops the IS execution and resets the yaml
-            // is_web_api.new_config();
-            // is_web_api.stop();
+        node.on('close', function() {
             node.status({ fill: null, shape: null, text: ""});
         });
     }

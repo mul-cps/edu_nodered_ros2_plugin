@@ -3,15 +3,10 @@ module.exports = function(RED)
 {
     var fs = require('fs');
     var path = require('path');
-    var is_web_api = require('is-web-api').ros2;
-    var home = process.env.HOME;
     var ros2_home = '/opt/ros/' + process.env.ROS_DISTRO;
-    if (process.env.IS_ROS2_PATH)
-    {
+    if (process.env.IS_ROS2_PATH) {
         ros2_home = process.env.IS_ROS2_PATH;
     }
-
-    var util = require('util');
 
     /*
      * @function ROS2Types constructor
@@ -26,35 +21,21 @@ module.exports = function(RED)
         RED.nodes.createNode(this, config);
         var node = this;
 
-        let {color, message} = is_web_api.add_ros2_type(config.ros2pkg, config.ros2message, config.wires[0]);
-        if (message && color)
-        {
-            node.status({ fill: color, shape: "dot", text: message});
-            node.emit("error", message);
-        }
-
         // Event emitted when the deploy is finished
         RED.events.once("flows:started", function() {
-            // let {color, message} = is_web_api.launch(config['id']);
-            // if (message && color)
-            {
-                node.status({ fill: "green", shape: "dot", text: "running"});
-            }
+            node.status({ fill: "green", shape: "dot", text: ""});
         });
 
 	    // Registers a listener to the input event,
         // which will be called whenever a message arrives at this node
-        node.on('input', function(msg)
-        {
+        node.on('input', function(msg) {
             // Passes the message to the next node in the flow
             node.send(msg);
         });
 
         // Called when there is a re-deploy or the program is closed
-        node.on('close', function()
-        {
-            // Stops the IS execution and resets the yaml
-            // is_web_api.stop();
+        node.on('close', function() {
+            node.status({ fill: null, shape: null, text: ""});            
         });
     }
 

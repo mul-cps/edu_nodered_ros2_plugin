@@ -1,9 +1,10 @@
 services:
-    visual-ros:
+    eduart-node-red:
+        user: root
         build:
             context: ..
             dockerfile: docker/Dockerfile
             args:
                 ROS_DISTRO: humble
         network_mode: host
-        command: node /usr/bin/node-red
+        command: node-red

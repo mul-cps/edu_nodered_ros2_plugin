@@ -15,7 +15,7 @@ class Ros2Instance {
 
   get node() {
     return this.ros_node;
-  }
+  }  
 }
 
 module.exports = new Ros2Instance();

@@ -3,9 +3,8 @@ const { send } = require('process');
 // RED argument provides the module access to Node-RED runtime api
 module.exports = function(RED)
 {
-    var events = require('events');
     var fs = require('fs');
-    var is_web_api = require('is-web-api').ros2;
+    var ros_node = require('../ros2/ros2-instance');
     /*
      * @function SubscriberNode constructor
      * This node is defined by the constructor function SubscriberNode,
@@ -21,60 +20,48 @@ module.exports = function(RED)
         var node = this;
         node.ready = false;
 
-        node.status({fill: "yellow", shape: "dot", text: "Wait until Visual-ROS is ready to be used."});
-
-        if(config.domain)
-        {
+        // \todo handle domain id differently
+        if(config.domain) {
             // modify the global domain
             node.domain = RED.nodes.getNode(config.domain).domain;
-            is_web_api.set_dds_domain(node.domain);
         }
 
-        let {color, message} = is_web_api.add_subscriber(config['id'], config["topic"], config['selectedtype'],
-            config['props']);
-        if (message && color)
-        {
-            node.status({ fill: color, shape: "dot", text: message });
+        try {
+            console.log("creating subscription...");
+            console.log("type:")
+            console.log(config['selectedtype']);
+            console.log("uses following props:")
+            console.log(config['props']);
+            this.subscription = ros_node.node.createSubscription(
+                config['selectedtype'], config['topic'], config['props'], function(msg) {
+                    // Callback Function for Receiving a ROS Message
+                    node.status({ fill: "green", shape: "dot", text: "message received" });
+                    // Passes the message to the next node in the flow
+                    console.log("received message:");
+                    console.log(msg);
+                    node.send(msg);                    
+            });
+            node.ready = true;
+            node.status({ fill: "yellow", shape: "dot", text: "created"});
+            console.log("subscription was created successfully");
+        }
+        catch (error) {
+            console.log("creating subscription failed");
+            console.log(error);
+            node.ready = false;
+            node.status({ fill: "red", shape: "dot", text: "error"});
         }
 
         // Event emitted when the deploy is finished
         RED.events.once('flows:started', function() {
-            let {color, message, event_emitter} = is_web_api.launch(config['id']);
-            if (message && color)
-            {
-                node.status({ fill: color, shape: "dot", text: message});
-            }
-            if (event_emitter)
-            {
-                // Event emitted when a new message is received
-                event_emitter.on(config["topic"] + '_data', function(msg_json)
-                {
-                    node.status({ fill: "green", shape: "dot", text: "Message Received" });
-                    // Passes the message to the next node in the flow
-                    node.send(msg_json['msg']);
-                });
-
-                // Event emitted when the WebSocket Client is connected correctly
-                event_emitter.on('ROS2_connected', function()
-                {
-                    node.ready = true;
-                    node.status({ fill: null, shape: null, text: null});
-                });
-
-                event_emitter.on('IS-ERROR', function(status)
-                {
-                    node.ready = false;
-                    node.status(status);
-                });
+            if (node.ready) {
+                node.status({ fill: "green", shape: "dot", text: "waiting to receive message"});
             }
         });
 
         // Called when there is a re-deploy or the program is closed
-        node.on('close', function()
-        {
-            // Stops the IS execution and resets the yaml
-            is_web_api.stop();
-            is_web_api.new_config();
+        node.on('close', function() {
+            node.status({ fill: null, shape: null, text: ""});
         });
     }
 

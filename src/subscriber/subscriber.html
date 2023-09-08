@@ -95,7 +95,8 @@
                             }
                             else
                             {
-                                const selectedtype = n.source.ros2pkg + '/' + n.source.ros2message;
+                                const selectedtype = n.source.ros2pkg + '/msg/' + n.source.ros2message;
+                                console.log("selected type: " + selectedtype);
                                 if (selectedtype !== '/')
                                 {
                                     node.selectedtype = selectedtype;

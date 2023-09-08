@@ -4,14 +4,10 @@ module.exports = function(RED)
     var execFile = require('child_process').execFile;
     var cron = require('cron');
     var fs = require('fs');
-    var home = process.env.HOME;
-    var idl_path = "";
     var ros2_home = '/opt/ros/' + process.env.ROS_DISTRO;
-    if (process.env.IS_ROS2_PATH)
-    {
+    if (process.env.IS_ROS2_PATH) {
         ros2_home = process.env.IS_ROS2_PATH;
     }
-    var is_web_api = require('is-web-api').ros2;
 
     /*
      * @function ROS2InjectNode constructor
@@ -65,16 +61,7 @@ module.exports = function(RED)
             node.repeaterSetup();
         }
 
-        var event_emitter = is_web_api.get_event_emitter();
-        if (event_emitter)
-        {
-            // Event emitted if the integration server failed
-            event_emitter.on('IS-ERROR', function(status)
-            {
-                node.status(status);
-            });
-        }
-
+        // Receiving of Input Data
         this.on("input", function(msg, send, done) {
             var errors = [];
 

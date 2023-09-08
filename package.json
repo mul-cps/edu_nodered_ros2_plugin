@@ -80,10 +80,7 @@
       "subscriber": "src/subscriber/subscriber.js",
       "IDL Type": "src/idl-types/idl-types.js",
       "ROS 2 Type": "src/ros2-types/ros2-types.js",
-      "ROS2 Inject": "src/ros2-message-inject/ros2-message-inject.js",
-      "FIWARE Publisher": "src/fiware_publisher/fiware_publisher.js",
-      "FIWARE Subscriber": "src/fiware_subscriber/fiware_subscriber.js",
-      "FIWARE Settings": "src/fiware-settings/fiware-settings.js"
+      "ROS2 Inject": "src/ros2-message-inject/ros2-message-inject.js"
     }
   }
 }
