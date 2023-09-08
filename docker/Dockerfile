@@ -1,7 +1,7 @@
 ARG ROS_DISTRO=humble
 
-FROM eprosima/vulcanexus:$ROS_DISTRO
-# FROM eduartrobotik/eduart-ros-base:humble-1.2.0
+# FROM eprosima/vulcanexus:$ROS_DISTRO
+FROM eduartrobotik/eduart-ros-base:humble-1.2.0
 
 # Avoid interactuation with installation of some package that needs the locale.
 USER root
@@ -31,8 +31,8 @@ RUN apt-get update && \
         libwebsocketpp-dev \
         libyaml-cpp-dev \
         python3-pip \
-        ros-$ROS_DISTRO-rmw-fastrtps-cpp \
-        ros-$ROS_DISTRO-fastrtps \
+        # ros-$ROS_DISTRO-rmw-fastrtps-cpp \
+        # ros-$ROS_DISTRO-fastrtps \
         wget && \
     pip3 install -U \
         colcon-common-extensions \
@@ -42,6 +42,12 @@ RUN apt-get update && \
     bash -c ./nodesource_setup.bash && \
     apt-get install -y nodejs
 
+# Install Integration Service used for ROS Type Determining
+RUN echo "building and installing integration service" \
+    && mkdir -p /is_ws/src && cd "$_" \
+    && git clone https://github.com/eProsima/Integration-Service.git is \
+    && . /opt/ros/$ROS_DISTRO/setup.sh \
+    && colcon build --cmake-args -DIS_ROS2_SH_MODE=DYNAMIC --install-base /opt/is
 
 # Install Node-RED and node-red-ros2-plugin
 RUN source /opt/ros/$ROS_DISTRO/setup.bash \

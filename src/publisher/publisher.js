@@ -33,7 +33,7 @@ module.exports = function(RED)
         try {
             console.log("creating publisher...");
             // this.publisher = ros_node.node.createPublisher(config['selectedtype'], config['topic'], config['props']);
-            this.publisher = ros_node.node.createPublisher('std_msgs/msg/String', 'string');
+            this.publisher = ros_node.node.createPublisher(config['selectedtype'], config['topic']);
             node.ready = true;
             node.status({ fill: "yellow", shape: "dot", text: "created"});
         }
@@ -84,11 +84,8 @@ module.exports = function(RED)
                 node.status({ fill: "green", shape: "dot", text: "Message Published"});
 
                 // Passes the message to the next node in the flow
-                console.log("received on input:");
-                console.log(msg);
                 node.send(msg);
-                this.publisher.publish(msg.payload);
-                // is_web_api.send_message(config['topic'], msg);
+                this.publisher.publish(msg);
             }
             else
             {
