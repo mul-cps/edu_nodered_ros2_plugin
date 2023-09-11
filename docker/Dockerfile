@@ -82,7 +82,7 @@ RUN source /opt/ros/$ROS_DISTRO/setup.bash \
         cron
 
 # Coping and Installing ROS2 Plugin
-COPY ./edu_nodered_ros2_plugin /home/user/
+COPY ./edu_nodered_ros2_plugin /home/user/edu_nodered_ros2_plugin
 RUN echo "installing ROS2 plugin" \
     && cd /home/user/ \
     # && export NVM_DIR="$HOME/.nvm" \

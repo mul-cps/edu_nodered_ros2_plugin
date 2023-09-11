@@ -182,7 +182,10 @@ module.exports = function(RED)
             // Defined Structure Position
 
             stdout = stdout.substr(stdout.indexOf('Struct Name:'));
-            console.log("stdout: ${stdout}");
+            console.log("stdout:");
+            console.log(stdout);
+            console.log(stderr);
+            console.log(error);
             var occurences = locations('Struct Name:', stdout);
 
             var i = 0;
