@@ -158,26 +158,7 @@ module.exports = function(RED)
         result.push(obj);
     }
 
-    // Function that returns the IDL associated with the selected message type
-    RED.httpAdmin.get("/getidl", RED.auth.needsPermission("ROS2 Inject.write"), function(req,res)
-    {
-        console.log("Building Message Type String");
-        var idl = "";
-        if (req.query['idl'])
-        {
-            idl = req.query['idl'];
-        }
-        else
-        {
-            var msg_path = ros2_home + "/share/" + req.query['package'] + "/msg/" + req.query['msg'] + ".idl";
-
-            idl = fs.readFileSync(msg_path).toString();
-        }
-
-        var type_dict = {};
-        console.log("idl string:");
-        console.log(idl);
-
+    function remove_constants_from_idl(idl) {
         message_string = [];
         drop_line = false;
         idl.split('\n').forEach(line => {
@@ -191,13 +172,64 @@ module.exports = function(RED)
                 message_string.push(line);
             }
         });
+
         console.log("message string");
         console.log(message_string.join('\n'));
+        return message_string.join('\n');
+    }
+
+    function pick_message_type_from_service_request(idl) {
+        message_string = [];
+        drop_line = false;
+        idl.split('\n').forEach(line => {
+            if (drop_line == false && line.includes("_Response {")) {
+                drop_line = true;
+            }
+            else if (drop_line == true && line.includes("};")) {
+                drop_line = false;
+            }
+            else if (drop_line == false) {
+                message_string.push(line);
+            }
+        });
+
+        console.log("message string");
+        console.log(message_string.join('\n').replace("_Request {", "Request {"));
+        return message_string.join('\n').replace("_Request {", "Request {");        
+    }
+
+    // Function that returns the IDL associated with the selected message type
+    RED.httpAdmin.get("/getidl", RED.auth.needsPermission("ROS2 Inject.write"), function(req,res)
+    {
+        console.log("Building Message Type String");
+        var idl = "";
+        var message_string = "";
+
+        if (req.query['idl']) {
+            idl = req.query['idl'];
+        }
+        else if (req.query['msg']) {
+            var msg_path = ros2_home + "/share/" + req.query['package'] + "/msg/" + req.query['msg'] + ".idl";
+            idl = fs.readFileSync(msg_path).toString();
+            message_string = remove_constants_from_idl(idl);
+        }
+        else if (req.query['srv']) {
+            var msg_path = ros2_home + "/share/" + req.query['package'] + "/srv/" + req.query['srv'] + ".idl";
+            idl = fs.readFileSync(msg_path).toString();
+            // message_string = pick_message_type_from_service_request(idl);
+            message_string = idl;     
+        }
+
+        var type_dict = {};
+        console.log("idl string:");
+        console.log(idl);
 
         // Executes the xtypes command line validator to get the type members
-        execFile("xtypes_idl_validator", [String(message_string.join('\n'))], function(error, stdout, stderr) {
+        execFile("xtypes_idl_validator", [String(message_string)], function(error, stdout, stderr) {
             // Defined Structure Position
-
+            console.log(stdout);
+            console.log(stderr);
+            console.log(error);
             stdout = stdout.substr(stdout.indexOf('Struct Name:'));
             var occurences = locations('Struct Name:', stdout);
 

@@ -200,11 +200,11 @@
 
                 var n = this;
 
-                $.getJSON('msgidl', { package: $("#node-input-ros2package-select").val().toString(),
+                $.getJSON('srvidl', { package: $("#node-input-ros2package-select").val().toString(),
                     msg: $("#node-input-ros2srv-select").val().toString() },  function(msg)
                 {
                     n.editor.getSession().getDocument().setValue(msg["idl"]);
-                    n.initEditor.getSession().getDocument().setValue(msg["msg"]);
+                    n.initEditor.getSession().getDocument().setValue(msg["srv"]);
 
                     $("#button-msg-editor").show();
                     $("#button-idl-editor").show();

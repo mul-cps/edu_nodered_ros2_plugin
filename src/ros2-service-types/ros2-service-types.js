@@ -84,7 +84,7 @@ module.exports = function(RED)
     });
 
     // Function that pass the selected message idl and srv codes
-    RED.httpAdmin.get("/msgidl", RED.auth.needsPermission('ROS2 Service Type.read'), function(req,res)
+    RED.httpAdmin.get("/srvidl", RED.auth.needsPermission('ROS2 Service Type.read'), function(req,res)
     {
         if (req.query['srv'])
         {
