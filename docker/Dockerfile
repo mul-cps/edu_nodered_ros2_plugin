@@ -68,10 +68,12 @@ RUN echo "building and installing integration service" \
     && mkdir -p /is_ws/src && cd "$_" \
     && git clone https://github.com/eProsima/Integration-Service.git is \
     && . /opt/ros/$ROS_DISTRO/setup.sh \
+    && source /home/user/ros/install/setup.bash \
     && colcon build --cmake-args -DIS_ROS2_SH_MODE=DYNAMIC --install-base /opt/is
 
 # Install Node-RED and node-red-ros2-plugin
 RUN source /opt/ros/$ROS_DISTRO/setup.bash \
+    && source /home/user/ros/install/setup.bash \
     # && export NVM_DIR="$HOME/.nvm" \
     # && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" \
     && npm install -g --unsafe-perm \
@@ -80,16 +82,16 @@ RUN source /opt/ros/$ROS_DISTRO/setup.bash \
         cron
 
 # Coping and Installing ROS2 Plugin
-COPY ./ /home/user/node-red-ros2-plugin
+COPY ./edu_nodered_ros2_plugin /home/user/
 RUN echo "installing ROS2 plugin" \
     && cd /home/user/ \
     # && export NVM_DIR="$HOME/.nvm" \
     # && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" \
-    && npm install -g ./node-red-ros2-plugin
+    && npm install -g ./edu_nodered_ros2_plugin
 
 # Enable overlay execution
 WORKDIR /
-COPY ./docker/entrypoint.bash .
+COPY ./entrypoint.bash .
 RUN chmod +x /entrypoint.bash
 
 # CMD [ "node", "/usr/bin/node-red" ]
