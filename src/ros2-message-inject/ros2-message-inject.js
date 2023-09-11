@@ -177,6 +177,16 @@ module.exports = function(RED)
         var type_dict = {};
         console.log("idl string:");
         console.log(idl);
+
+        message_string = [];
+        Str(idl).lines().forEach(line => {
+            if (line.includes("const") == false) {
+                message_string.push(line);
+            }
+        });
+        console.log("message string");
+        console.log(message_string);
+
         // Executes the xtypes command line validator to get the type members
         execFile("xtypes_idl_validator", [String(idl)], function(error, stdout, stderr) {
             // Defined Structure Position
