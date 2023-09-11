@@ -84,6 +84,9 @@ RUN source /opt/ros/$ROS_DISTRO/setup.bash \
 # Coping and Installing ROS2 Plugin
 COPY ./edu_nodered_ros2_plugin /home/user/edu_nodered_ros2_plugin
 RUN echo "installing ROS2 plugin" \
+    # Copying of custom eduart message types, so it can be found by the plugin.
+    && cp /home/user/ros/install/edu_robot/share/edu_robot/ /opt/ros/humble/share/ -r \
+    # Installing
     && cd /home/user/ \
     # && export NVM_DIR="$HOME/.nvm" \
     # && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" \

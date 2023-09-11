@@ -161,7 +161,7 @@ module.exports = function(RED)
     // Function that returns the IDL associated with the selected message type
     RED.httpAdmin.get("/getidl", RED.auth.needsPermission("ROS2 Inject.write"), function(req,res)
     {
-        console.log("DA GENAU HIER!");
+        console.log("Building Message Type String");
         var idl = "";
         if (req.query['idl'])
         {
@@ -179,23 +179,26 @@ module.exports = function(RED)
         console.log(idl);
 
         message_string = [];
-        Str(idl).lines().forEach(line => {
-            if (line.includes("const") == false) {
+        drop_line = false;
+        idl.split('\n').forEach(line => {
+            if (drop_line == false && line.includes("_Constants {")) {
+                drop_line = true;
+            }
+            else if (drop_line == true && line.includes("};")) {
+                drop_line = false;
+            }
+            else if (drop_line == false) {
                 message_string.push(line);
             }
         });
         console.log("message string");
-        console.log(message_string);
+        console.log(message_string.join('\n'));
 
         // Executes the xtypes command line validator to get the type members
-        execFile("xtypes_idl_validator", [String(idl)], function(error, stdout, stderr) {
+        execFile("xtypes_idl_validator", [String(message_string.join('\n'))], function(error, stdout, stderr) {
             // Defined Structure Position
 
             stdout = stdout.substr(stdout.indexOf('Struct Name:'));
-            console.log("stdout:");
-            console.log(stdout);
-            console.log(stderr);
-            console.log(error);
             var occurences = locations('Struct Name:', stdout);
 
             var i = 0;
