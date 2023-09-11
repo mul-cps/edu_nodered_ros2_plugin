@@ -80,7 +80,9 @@
       "subscriber": "src/subscriber/subscriber.js",
       "IDL Type": "src/idl-types/idl-types.js",
       "ROS 2 Type": "src/ros2-types/ros2-types.js",
-      "ROS2 Inject": "src/ros2-message-inject/ros2-message-inject.js"
+      "ROS2 Inject": "src/ros2-message-inject/ros2-message-inject.js",
+      "ROS2 Service Type": "src/ros2-service-types/ros2-service-types.js",
+      "Service Client": "src/service-client/service-client.js"
     }
   }
 }
