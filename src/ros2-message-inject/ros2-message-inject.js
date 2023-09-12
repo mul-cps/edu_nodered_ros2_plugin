@@ -194,9 +194,164 @@ module.exports = function(RED)
         });
 
         console.log("message string");
-        console.log(message_string.join('\n').replace("_Request {", "Request {"));
-        return message_string.join('\n').replace("_Request {", "Request {");        
+        console.log(message_string.join('\n'));
+        return message_string.join('\n');        
     }
+
+    function get_line_indent(line) {
+        for (let i = 0; i < line.length; ++i) {
+            if (line.charAt(i) != '\t') {
+                return i;
+            }
+        }
+    }
+
+    function get_index_of_last_colon(line) {
+        for (let i = line.length - 1; i >= 0; --i) {
+            if (line.charAt(i) == '.') {
+                return i;
+            }
+        }
+
+        throw new Error("String doesn't contain a colon.");
+    }
+
+    function get_index_of_nth_colon(line, nth) {
+        num_found_colon = 0;
+        for (let i = 0; i < line.length; ++i) {
+            if (line.charAt(i) == '.') {
+                ++num_found_colon;
+                if (num_found_colon >= nth) {
+                    return i;
+                }
+            }
+        }
+
+        throw new Error("String doesn't contain enough colons.");
+    }
+
+    function get_type_and_name(line) {
+        line_parts = line.split(' ');
+        if (line_parts.length < 2) {
+            // unexpected format --> ignore
+            console.log("line '" + line + "' should be a type definition");
+            return;
+        }
+
+        return { type: line_parts[0], name: line_parts[1] };
+    }
+
+    RED.httpAdmin.get("/getinterface", RED.auth.needsPermission("ROS2 Inject.write"), function(req,res)
+    {
+        console.log("Try to get interface:");
+        var interface_name = "";
+        var type_list = [];
+
+        if (req.query['msg']) {
+            interface_name = req.query['package'] + "/msg/" + req.query['msg'];
+        }
+        else if (req.query['srv']) {
+            interface_name = req.query['package'] + "/srv/" + req.query['srv'];
+        }
+        else {
+            console.log("Missing 'msg' or 'srv' in getinterface request.");
+            return;
+        }
+        console.log("interface name = " + interface_name);
+        execFile("ros2", ["interface", "show", interface_name], function(error, stdout, stderr) {
+            // handle special case ROS service
+            if (req.query['srv']) {
+                // get request type only
+                stdout = stdout.split('---')[0];
+                console.log("picked request part only:");
+                console.log(stdout);
+            }
+
+            type_indent = 0;
+            type_name = "";
+            type = "";
+
+            stdout.split('\n').forEach(line => {
+                if (line.indexOf('#') >= 0) {
+                    // remove comment from line
+                    line = line.substring(0, line.indexOf('#'));
+                }
+                if (line.length == 0 || line.charAt(0) == ' ' || line.charAt(0) == '\n') {
+                    // empty line --> ignore
+                    return;
+                }
+                if (line.includes('=')) {
+                    // constant value --> ignore
+                    return;
+                }
+                // clean up line
+                let current_line_indent = get_line_indent(line);
+                line = line.substring(current_line_indent);
+                console.log('cleaned up line: ' + line);
+                console.log('type_indent = ' + type_indent);
+                console.log('current_line_indent = ' + current_line_indent);
+
+                if (current_line_indent > type_indent) {
+                    // found new subtype --> add to name
+                    type_indent = current_line_indent;
+                    type_entry = get_type_and_name(line);
+                    type_name += '.' + type_entry['name'];
+                    type = type_entry['type'];
+                }
+                else if (current_line_indent == type_indent) {
+                    // found new type
+                    // --> store previous one in list
+                    type_list.push({ 'type': type, 'name': type_name });
+                    // --> get current one
+                    type_indent = current_line_indent;
+                    type_entry = get_type_and_name(line);
+                    type = type_entry['type'];       
+
+                    if (current_line_indent == 0) {
+                        type_name = type_entry['name'];
+                    }
+                    else {
+                        type_name = type_name.substring(0, get_index_of_last_colon(type_name)) + '.' + type_entry['name'];
+                    }
+                }
+                else if (current_line_indent == 0) {
+                    // top level
+                    // --> store previous one in list
+                    type_list.push({ 'type': type, 'name': type_name });
+                    // --> get current one
+                    type_indent = current_line_indent;
+                    type_entry = get_type_and_name(line);
+                    type_name = type_entry['name'];
+                    type = type_entry['type'];                         
+                }
+                else {
+                    // end of subtype
+                    // --> store previous one in list
+                    type_list.push({ 'type': type, 'name': type_name });
+                    // --> get current one
+                    type_indent = current_line_indent;
+                    type_entry = get_type_and_name(line);
+                    type_name = type_name.substring(0, get_index_of_nth_colon(type_name, current_line_indent)) + '.' + type_entry['name'];
+                    type = type_entry['type'];                                                            
+                }
+
+                console.log("type_name = " + type_name);
+                console.log("type = " + type);
+            });
+
+            type_list.push({ 'type': type, 'name': type_name });
+            console.log("found type list:");
+            type_list.shift();
+            console.log(type_list);
+            res.json(type_list);
+            console.log("res:\n" + res);
+
+            console.log("DEBUG OUTPUT");
+            console.log(stdout);
+            console.log(stderr);
+            console.log(error);
+        });
+    })
 
     // Function that returns the IDL associated with the selected message type
     RED.httpAdmin.get("/getidl", RED.auth.needsPermission("ROS2 Inject.write"), function(req,res)
@@ -216,20 +371,20 @@ module.exports = function(RED)
         else if (req.query['srv']) {
             var msg_path = ros2_home + "/share/" + req.query['package'] + "/srv/" + req.query['srv'] + ".idl";
             idl = fs.readFileSync(msg_path).toString();
-            // message_string = pick_message_type_from_service_request(idl);
-            message_string = idl;     
+            message_string = pick_message_type_from_service_request(idl);
+            // message_string = idl;     
         }
 
         var type_dict = {};
-        console.log("idl string:");
-        console.log(idl);
+        // console.log("idl string:");
+        // console.log(idl);
 
         // Executes the xtypes command line validator to get the type members
         execFile("xtypes_idl_validator", [String(message_string)], function(error, stdout, stderr) {
             // Defined Structure Position
-            console.log(stdout);
-            console.log(stderr);
-            console.log(error);
+            // console.log(stdout);
+            // console.log(stderr);
+            // console.log(error);
             stdout = stdout.substr(stdout.indexOf('Struct Name:'));
             var occurences = locations('Struct Name:', stdout);
 

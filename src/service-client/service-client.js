@@ -31,8 +31,6 @@ module.exports = function(RED)
             console.log("type:")
             console.log(config['selectedtype']);
 
-            qos = get_qos_from_props(config['props']);
-
             this.client = ros_node.node.createClient(config['selectedtype'], config['topic'])
             node.ready = true;
             node.status({ fill: "yellow", shape: "dot", text: "created"});
@@ -48,14 +46,20 @@ module.exports = function(RED)
         // Event emitted when the deploy is finished
         RED.events.once('flows:started', function() {
             if (node.ready) {
-                node.status({ fill: "green", shape: "dot", text: "waiting to receive message"});
+                node.status({ fill: "green", shape: "dot", text: "waiting to request service"});
             }
         });
 
         // Registers a listener to the input event,
         // which will be called whenever a message arrives at this node
         node.on('input', function(msg) {
-            if (node.ready && this.client.isServiceServerAvailable()) {
+            if (node.ready) {
+                if (this.client.isServiceServerAvailable() == false) {
+                    node.status({ fill: "yellow", shape: "dot", text: "service not available"});
+                    return;
+                }
+
+                // service is available and ready
                 node.status({ fill: "green", shape: "dot", text: "request published"});
 
                 this.client.sendRequest(msg, function(response) {

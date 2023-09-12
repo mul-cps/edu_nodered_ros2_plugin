@@ -144,7 +144,10 @@
 
     var types_dict = {'std::string' : 'str', 'char' : 'str', 'char16_t' : 'str', 'wchar_t' : 'str', 'float' : 'num', 'double' : 'num',
         'long double' : 'num', 'int8_t' : 'num', 'int16_t' : 'num', 'int32_t' : 'num', 'int64_t' : 'num', 'uint8_t' : 'num', 'uint16_t' : 'num',
-        'uint32_t' : 'num', 'uint64_t' : 'num', 'bool' : 'bool'};
+        'uint32_t' : 'num', 'uint64_t' : 'num', 'bool' : 'bool', "float32" : "num", "float64" : "num"};
+    var type_map = {'std::string' : 'str', 'char' : 'str', 'char16' : 'str', 'wchar' : 'str', 'float' : 'num', 'double' : 'num',
+        'long double' : 'num', 'int8' : 'num', 'int16' : 'num', 'int32' : 'num', 'int64' : 'num', 'uint8' : 'num', 'uint16' : 'num',
+        'uint32' : 'num', 'uint64' : 'num', 'bool' : 'bool', 'float32' : 'num', 'float64' : 'num', 'string' : 'str'};
     var containers = ['sequence', 'array', 'map', 'enum', 'union'];
 
     var custom_struct = {};
@@ -187,8 +190,22 @@
             return;
         }
 
+        $.getJSON('getinterface', params, function(type_list) {
+            console.log("get interfaces");
+            console.log("received type list:");
+            console.log(type_list);
+            console.log("length type list = " + type_list.length);
+            type_list.forEach( function(type) {
+                let m = { p: type['name'], v: "", vt: type_map[type['type']], t: type['type'] };
+                console.log("add entry:");
+                console.log(m);
+                node.props.push(m);
+            });
+            node.props.forEach(p => $("#node-input-property-container").editableList('addItem', p));
+        });
         $.getJSON('getidl', params, function(idl)
         {
+            return;
             console.log("getJSON");
             console.log(params);
             console.log(idl);
@@ -319,6 +336,8 @@
             }
             else
             {
+                console.log("print props:");
+                node.props.forEach(p => { console.log("p:"); console.log(p); });
                 node.props.forEach(p => $("#node-input-property-container").editableList('addItem', p));
             }
         });
