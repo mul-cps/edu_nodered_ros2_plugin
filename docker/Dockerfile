@@ -63,14 +63,6 @@ RUN apt-get update \
     bash -c ./nodesource_setup.bash && \
     apt-get install -y nodejs
 
-# Install Integration Service used for ROS Type Determining
-RUN echo "building and installing integration service" \
-    && mkdir -p /is_ws/src && cd "$_" \
-    && git clone https://github.com/eProsima/Integration-Service.git is \
-    && . /opt/ros/$ROS_DISTRO/setup.sh \
-    && source /home/user/ros/install/setup.bash \
-    && colcon build --cmake-args -DIS_ROS2_SH_MODE=DYNAMIC --install-base /opt/is
-
 # Install Node-RED and node-red-ros2-plugin
 RUN source /opt/ros/$ROS_DISTRO/setup.bash \
     && source /home/user/ros/install/setup.bash \

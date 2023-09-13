@@ -6,7 +6,7 @@ services:
         #     dockerfile: docker/Dockerfile
         #     args:
         #         ROS_DISTRO: humble
-        image: eduart-nodered:0.2.0
+        image: eduartrobotik/eduart-nodered:0.2.0
         network_mode: host
         command: node-red
         restart: always
