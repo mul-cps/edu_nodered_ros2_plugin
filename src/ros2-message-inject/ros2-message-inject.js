@@ -231,7 +231,7 @@ module.exports = function(RED)
     }
 
     function get_type_and_name(line) {
-        line_parts = line.split(' ');
+        line_parts = line.split(/\s+/);
         if (line_parts.length < 2) {
             // unexpected format --> ignore
             console.log("line '" + line + "' should be a type definition");
