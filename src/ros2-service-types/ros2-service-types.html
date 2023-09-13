@@ -129,6 +129,7 @@
                     //Gets the IS ROS 2 compiled packages and add them to the packages selector
                     $.getJSON('ros2packages', function(data)
                     {
+                        console.log(data);
                         $("#node-input-ros2package-select").empty();
                         $("<option></option>").appendTo("#node-input-ros2package-select");
                         $.each(data, function(i, package)

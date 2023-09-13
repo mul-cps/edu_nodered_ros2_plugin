@@ -45,18 +45,47 @@ module.exports = function(RED)
     // Function that pass the IS ROS 2 compiled packages to the html file
     RED.httpAdmin.get("/ros2packages", RED.auth.needsPermission('ROS2 Service Type.read'), function(req,res)
     {
-        var files = fs.readdirSync(ros2_home + "/share/");
+        console.log("Estimate all packages that provide services.");
+        execFile("ros2", ["interface", "list"], function(error, stdout, stderr) {    
+            var found_service_start = false;
+            var package_list = [];
+            
+            stdout.split('\n').forEach(line => {
+                if (found_service_start == false && line.include("Services:")) {
+                    // found start of services --> processing list at next iteration
+                    found_service_start = true;
+                    return;
+                }
+                if (found_service_start == false) {
+                    // no services --> no processing
+                    return;
+                }
+                if (found_service_start == true && line.include("Actions:")) {
+                    // end of services reached --> stop processing
+                    found_service_start = false;
+                    return;
+                }
 
-        // Check if it is a srv package
-        files.forEach( function(value)
-        {
-            if (!fs.existsSync(ros2_home + "/share/" + value + "/srv"))
-            {
-                files = files.filter(f => f != value);
-            }
+                service_list.push(line.split('/')[0]);
+            });
+
+            console.log("Found following packages that provide services:");
+            console.log(package_list);
+            res.json(package_list);
         });
 
-        res.json(files);
+        // var files = fs.readdirSync(ros2_home + "/share/");
+
+        // // Check if it is a srv package
+        // files.forEach( function(value)
+        // {
+        //     if (!fs.existsSync(ros2_home + "/share/" + value + "/srv"))
+        //     {
+        //         files = files.filter(f => f != value);
+        //     }
+        // });
+
+        // res.json(files);
     });
 
     // Function that pass the IS ROS 2 package compiled msgs to the html file
