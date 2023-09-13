@@ -127,7 +127,7 @@
                 if (!$("#node-input-ros2package-select").is(":focus"))
                 {
                     //Gets the IS ROS 2 compiled packages and add them to the packages selector
-                    $.getJSON('ros2packages', function(data)
+                    $.getJSON('ros2srvspackages', function(data)
                     {
                         console.log(data);
                         $("#node-input-ros2package-select").empty();
