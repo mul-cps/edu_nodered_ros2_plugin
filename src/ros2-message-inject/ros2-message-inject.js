@@ -126,78 +126,6 @@ module.exports = function(RED)
         }
     });
 
-    /**
-     * @brief Function that returns all the occurences of the substring in the main string
-     * @param {String} substring - Contains the characters that want to be located
-     * @param {String} string - Contains the main string
-     * @returns
-     */
-    function locations (substring, string) {
-        var a = [],i = -1;
-        while ((i = string.indexOf(substring, i+1)) >= 0)
-        {
-            a.push(i);
-        }
-        return a;
-    };
-
-    /**
-     * @brief Function to sort the type structures according to its dependencies
-     * @param {Array} result - Array for storing the sort result
-     * @param {Array} visited - Array containing the objects already visited
-     * @param {Map} map - Map containing all the objects that need to be sorted
-     * @param {Object} obj  - Current object
-     */
-    function sort_util(result, visited, map, obj){
-        visited[obj[0]] = true;
-        Object.entries(obj[1]).forEach(function(dep){
-            if(!visited[dep[1]] && Object.keys(map).includes(dep[1])) {
-                sort_util(result, visited, map, map[dep[1]]);
-            }
-        });
-        result.push(obj);
-    }
-
-    function remove_constants_from_idl(idl) {
-        message_string = [];
-        drop_line = false;
-        idl.split('\n').forEach(line => {
-            if (drop_line == false && line.includes("_Constants {")) {
-                drop_line = true;
-            }
-            else if (drop_line == true && line.includes("};")) {
-                drop_line = false;
-            }
-            else if (drop_line == false) {
-                message_string.push(line);
-            }
-        });
-
-        console.log("message string");
-        console.log(message_string.join('\n'));
-        return message_string.join('\n');
-    }
-
-    function pick_message_type_from_service_request(idl) {
-        message_string = [];
-        drop_line = false;
-        idl.split('\n').forEach(line => {
-            if (drop_line == false && line.includes("_Response {")) {
-                drop_line = true;
-            }
-            else if (drop_line == true && line.includes("};")) {
-                drop_line = false;
-            }
-            else if (drop_line == false) {
-                message_string.push(line);
-            }
-        });
-
-        console.log("message string");
-        console.log(message_string.join('\n'));
-        return message_string.join('\n');        
-    }
-
     function get_line_indent(line) {
         for (let i = 0; i < line.length; ++i) {
             if (line.charAt(i) != '\t') {
@@ -344,86 +272,12 @@ module.exports = function(RED)
             type_list.shift();
             console.log(type_list);
             res.json(type_list);
-            console.log("res:\n" + res);
+            // console.log("res:\n" + res);
 
-            console.log("DEBUG OUTPUT");
-            console.log(stdout);
-            console.log(stderr);
-            console.log(error);
-        });
-    })
-
-    // Function that returns the IDL associated with the selected message type
-    RED.httpAdmin.get("/getidl", RED.auth.needsPermission("ROS2 Inject.write"), function(req,res)
-    {
-        console.log("Building Message Type String");
-        var idl = "";
-        var message_string = "";
-
-        if (req.query['idl']) {
-            idl = req.query['idl'];
-        }
-        else if (req.query['msg']) {
-            var msg_path = ros2_home + "/share/" + req.query['package'] + "/msg/" + req.query['msg'] + ".idl";
-            idl = fs.readFileSync(msg_path).toString();
-            message_string = remove_constants_from_idl(idl);
-        }
-        else if (req.query['srv']) {
-            var msg_path = ros2_home + "/share/" + req.query['package'] + "/srv/" + req.query['srv'] + ".idl";
-            idl = fs.readFileSync(msg_path).toString();
-            message_string = pick_message_type_from_service_request(idl);
-            // message_string = idl;     
-        }
-
-        var type_dict = {};
-        // console.log("idl string:");
-        // console.log(idl);
-
-        // Executes the xtypes command line validator to get the type members
-        execFile("xtypes_idl_validator", [String(message_string)], function(error, stdout, stderr) {
-            // Defined Structure Position
+            // console.log("DEBUG OUTPUT");
             // console.log(stdout);
             // console.log(stderr);
             // console.log(error);
-            stdout = stdout.substr(stdout.indexOf('Struct Name:'));
-            var occurences = locations('Struct Name:', stdout);
-
-            var i = 0;
-            occurences.forEach( s_pos =>
-            {
-                var members = locations('Struct Member:', stdout);
-                var struct_name = stdout.substr(s_pos + 12/*Struct Name:*/, members[i] - (s_pos + 12 + 1) /*\n*/);
-                type_dict[struct_name] = {};
-
-                members.forEach( pos => {
-                    var init_pos = stdout.indexOf('[', pos);
-                    var inner_name = stdout.substr(pos + 14/*Struct Member:*/, init_pos - (pos + 14));
-                    if (inner_name == struct_name)
-                    {
-                        var member = stdout.substr(init_pos + 1, stdout.indexOf(']', pos) - init_pos - 1);
-                        var data = member.split(',');
-                        type_dict[inner_name][data[0]] = data[1];
-                        i++;
-                    }
-                });
-            });
-
-            var map = {}; // Creates key value pair of name and object
-            var result = []; // the result array
-            var visited = {}; // takes a note of the traversed dependency
-
-            Object.entries(type_dict).forEach( function(obj){ // build the map
-                map[obj[0]]  = obj;
-            });
-
-            Object.entries(type_dict).forEach(function(obj){ // Traverse array
-                if(!visited[obj[0]]) { // check for visited object
-                    sort_util(result, visited, map, obj);
-                }
-            });
-
-            console.log(result);
-            res.json(result);
         });
-    });
+    })
 }
