@@ -1,15 +1,15 @@
 services:
     eduart-node-red:
         user: root
-        # build:
-        #     context: ..
-        #     dockerfile: docker/Dockerfile
-        #     args:
-        #         ROS_DISTRO: humble
-        image: eduartrobotik/eduart-nodered:0.2.0
+        image: eduart-nodered:0.2.0
         network_mode: host
-        command: node-red
+        command: node-red --userDir /data
         restart: always
         privileged: true
         ipc: host
         pid: host
+        volumes:
+            - node_red_user_data:/data
+
+volumes:
+    node_red_user_data:
