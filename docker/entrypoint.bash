@@ -2,7 +2,7 @@
 
 # Setup ROS 2  environment
 source /opt/ros/humble/setup.bash
-source /opt/is/setup.bash
+source /home/user/ros/install/setup.bash
 export NODE_PATH=/usr/lib/node_modules
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 # export NVM_DIR="$HOME/.nvm"

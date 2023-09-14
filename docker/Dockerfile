@@ -1,7 +1,4 @@
 ARG ROS_DISTRO=humble
-
-# FROM eprosima/vulcanexus:$ROS_DISTRO
-# FROM eduartrobotik/eduart-ros-base:humble-1.2.0
 FROM eduartrobotik/eduart-robot:0.3.1
 
 # Avoid interactuation with installation of some package that needs the locale.

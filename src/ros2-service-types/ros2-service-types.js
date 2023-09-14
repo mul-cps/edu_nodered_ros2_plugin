@@ -2,11 +2,6 @@
 module.exports = function(RED)
 {
     var execFile = require('child_process').execFile;    
-    var fs = require('fs');
-    var ros2_home = '/opt/ros/' + process.env.ROS_DISTRO;
-    if (process.env.IS_ROS2_PATH) {
-        ros2_home = process.env.IS_ROS2_PATH;
-    }
 
     /*
      * @function ROS2ServiceTypes constructor
@@ -116,31 +111,5 @@ module.exports = function(RED)
             console.log(service_list);
             res.json(service_list);
         });
-    });
-
-    // Function that pass the selected message idl and srv codes
-    RED.httpAdmin.get("/srvidl", RED.auth.needsPermission('ROS2 Service Type.read'), function(req,res)
-    {
-        if (req.query['srv'])
-        {
-            var json_data = {}
-            // IDL
-            var msg_path = ros2_home + "/share/" + req.query['package'] + "/srv/" + req.query['srv'];
-
-            var idl = fs.readFileSync(msg_path + ".idl").toString();
-            json_data["idl"] = idl;
-
-            // MSG
-            if (fs.existsSync(msg_path + ".srv"))
-            {
-                var srv = fs.readFileSync(msg_path + ".srv").toString();
-                json_data["srv"] = srv;
-            }
-            else
-            {
-                json_data["srv"] = "";
-            }
-            res.json(json_data);
-        }
     });
 }

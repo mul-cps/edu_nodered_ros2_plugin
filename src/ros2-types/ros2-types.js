@@ -2,11 +2,6 @@
 module.exports = function(RED)
 {
     var execFile = require('child_process').execFile;    
-    var fs = require('fs');
-    var ros2_home = '/opt/ros/' + process.env.ROS_DISTRO;
-    if (process.env.IS_ROS2_PATH) {
-        ros2_home = process.env.IS_ROS2_PATH;
-    }
 
     /*
      * @function ROS2Types constructor
@@ -116,31 +111,5 @@ module.exports = function(RED)
             console.log(message_list);
             res.json(message_list);
         });
-    });
-
-    // Function that pass the selected message idl and msg codes
-    RED.httpAdmin.get("/msgidl", RED.auth.needsPermission('ROS2 Type.read'), function(req,res)
-    {
-        if (req.query['msg'])
-        {
-            var json_data = {}
-            // IDL
-            var msg_path = ros2_home + "/share/" + req.query['package'] + "/msg/" + req.query['msg'];
-
-            var idl = fs.readFileSync(msg_path + ".idl").toString();
-            json_data["idl"] = idl;
-
-            // MSG
-            if (fs.existsSync(msg_path + ".msg"))
-            {
-                var msg = fs.readFileSync(msg_path + ".msg").toString();
-                json_data["msg"] = msg;
-            }
-            else
-            {
-                json_data["msg"] = "";
-            }
-            res.json(json_data);
-        }
     });
 }
