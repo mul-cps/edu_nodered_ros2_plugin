@@ -91,7 +91,7 @@ module.exports = function(RED)
                     // Passes the message to the next node in the flow
                     console.log("received message:");
                     console.log(msg);
-                    node.send(msg);                    
+                    node.send({ payload: msg });                    
             });
             node.ready = true;
             node.status({ fill: "yellow", shape: "dot", text: "created"});

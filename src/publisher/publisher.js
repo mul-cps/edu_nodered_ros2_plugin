@@ -110,7 +110,7 @@ module.exports = function(RED)
 
                 // Passes the message to the next node in the flow
                 node.send(msg);
-                this.publisher.publish(msg);
+                this.publisher.publish(msg.payload);
             }
             else {
                done("node was not ready to process flow data");

@@ -82,7 +82,7 @@ module.exports = function(RED)
             if (errors.length) {
                 done(errors.join('; '));
             } else {
-                send(msg);
+                send({ payload: msg });
                 done();
             }
         });
