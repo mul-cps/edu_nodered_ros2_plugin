@@ -1,8 +1,8 @@
 <!--Properties that can be configured for this node-->
-<script type="text/html" data-template-name="Subscriber">
+<script type="text/html" data-template-name="Service Client">
     <div class="form-row">
         <label for="node-input-topic"><i class="fa fa-tag"></i>&nbsp;&nbsp; Topic </label>
-        <input type="text" id="node-input-topic" placeholder="Topic">
+        <input type="text" id="node-input-topic" placeholder="Service">
     </div>
     <div class="form-row">
         <label for="node-input-domain"><i class="fa fa-globe"></i>&nbsp;&nbsp; Domain ID </label>
@@ -33,7 +33,7 @@
         $("#node-input-property-container").editableList('height',height);
     }
 
-    RED.nodes.registerType('Subscriber',
+    RED.nodes.registerType('Service Client',
     {
         category: 'ROS 2',
         color: '#77b4ea',
@@ -53,7 +53,7 @@
         },
         label: function()
         {
-            return this.name || "ROS2 Subscriber";
+            return this.name || "ROS2 Service Client";
         },
         oneditprepare: function()
         {
@@ -103,6 +103,22 @@
                                 }
                             }
                             break;
+                        case "ROS2 Service Type":
+                            linked = true;
+                            if (n.source.validationErrors.length > 0)
+                            {
+                                RED.notify("The type must be configured before", "error");
+                            }
+                            else
+                            {
+                                const selectedtype = n.source.ros2pkg + '/srv/' + n.source.ros2service;
+                                console.log("selected type: " + selectedtype);
+                                if (selectedtype !== '/')
+                                {
+                                    node.selectedtype = selectedtype;
+                                }
+                            }
+                            break;                            
                         case "IDL Type":
                             linked = true;
                             if (n.source.validationErrors.length > 0)
@@ -160,7 +176,7 @@
                     typesmap.set("lifespan.period.nanosec", "num");
                     typesmap.set("liveliness.kind", livelinesskind);
                     typesmap.set("liveliness.lease_duration.sec", "num");
-                    typesmap.set("liveliness.lease_duration.nanosec", "num");
+                    typesmap.set("liveliness.lease_duratopiction.nanosec", "num");
 
                     $.getJSON('subqosdescription', function(data)
                     {
@@ -267,8 +283,8 @@
 })();
 </script>
 
-<!--Help text shown for the ROS2 Subscriber node-->
-<script type="text/html" data-help-name="Subscriber">
+<!--Help text shown for the ROS2 Service Client node-->
+<script type="text/html" data-help-name="Service Client">
     <p>This node represents a ROS 2 subscriber. It is able of subscribe to a specific topic and receive all the messages published on it.</p>
     <h3>Settings</h3>
         <p>By using this node, you can configure the following ROS 2 settings: </p>

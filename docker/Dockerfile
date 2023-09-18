@@ -1,9 +1,9 @@
 ARG ROS_DISTRO=humble
-
-FROM eprosima/vulcanexus:$ROS_DISTRO
+FROM eduartrobotik/eduart-robot:0.3.1
 
 # Avoid interactuation with installation of some package that needs the locale.
-ENV TZ=Europe/Madrid
+USER root
+ENV TZ=Europe/Berlin
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Avoids using interactions during building
@@ -12,12 +12,34 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Use a bash shell so it is possigle to run things like `source` (required for colcon builds)
 SHELL ["/bin/bash", "-c"]
 
+# Installing Node Red with ROS2 node.js integration
+# RUN echo "Installing Node Red with ROS2 Plugin" \
+#     cd /home/$USER \
+#     && wget https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh \
+#     && chmod u+x install.sh \
+#     && ./install.sh \
+#     && export NVM_DIR="$HOME/.nvm" \
+#     && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" \
+#     && nvm install 18 node \
+#     && source /opt/ros/$ROS_DISTRO/setup.bash \
+#     && source /home/user/ros/install/setup.bash \
+#     && npm install -g --unsafe-perm \
+#         node-red \
+#         rclnodejs \
+#         cron
+
 # Install Integration Service dependencies
-RUN apt-get update && \
-    apt-get install -y \
+RUN apt-get update \
+    && apt-get remove -y \
+        nodejs \
+        libnode-dev \
+        libnode72 \
+    && apt-get install -y \
         cmake \
         curl \
         g++ \
+        gcc \
+        make \
         git \
         libasio-dev \
         libboost-dev \
@@ -32,32 +54,38 @@ RUN apt-get update && \
         wget && \
     pip3 install -U \
         colcon-common-extensions \
-        vcstool && \
-    curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.bash && \
+        vcstool \
+    && curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.bash && \
     chmod +x nodesource_setup.bash && \
     bash -c ./nodesource_setup.bash && \
     apt-get install -y nodejs
 
-# Install eProsima Integration Service
-WORKDIR /is_ws
-RUN mkdir src && cd src && \
-    git clone https://github.com/eProsima/Integration-Service.git is && \
-    git clone https://github.com/eProsima/WebSocket-SH.git && \
-    git clone https://github.com/eProsima/ROS2-SH.git && \
-    git clone https://github.com/eProsima/FIWARE-SH.git && \
-    source /opt/vulcanexus/$ROS_DISTRO/setup.bash && \
-    colcon build --cmake-args -DIS_ROS2_SH_MODE=DYNAMIC --install-base /opt/is
-
 # Install Node-RED and node-red-ros2-plugin
-RUN npm install -g --unsafe-perm \
+RUN source /opt/ros/$ROS_DISTRO/setup.bash \
+    && source /home/user/ros/install/setup.bash \
+    # && export NVM_DIR="$HOME/.nvm" \
+    # && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" \
+    && npm install -g --unsafe-perm \
         node-red \
-        node-red-ros2-plugin \
-        node-red-contrib-keypress
+        rclnodejs \
+        cron
+
+# Coping and Installing ROS2 Plugin
+COPY ./edu_nodered_ros2_plugin /home/user/edu_nodered_ros2_plugin
+RUN echo "installing ROS2 plugin" \
+    # Copying of custom eduart message types, so it can be found by the plugin.
+    && cp /home/user/ros/install/edu_robot/share/edu_robot/ /opt/ros/humble/share/ -r \
+    # Installing
+    && cd /home/user/ \
+    # && export NVM_DIR="$HOME/.nvm" \
+    # && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" \
+    && npm install -g ./edu_nodered_ros2_plugin
 
 # Enable overlay execution
 WORKDIR /
-COPY entrypoint.bash .
+COPY ./entrypoint.bash .
 RUN chmod +x /entrypoint.bash
 
-CMD [ "node", "/usr/bin/node-red" ]
+# CMD [ "node", "/usr/bin/node-red" ]
+CMD /usr/bin/node-red
 ENTRYPOINT [ "/entrypoint.bash" ]

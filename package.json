@@ -1,5 +1,5 @@
 {
-  "name": "node-red-ros2-plugin",
+  "name": "edu-nodered-ros2-plugin",
   "license": "MIT",
   "description": "A collection of Node-RED nodes for connecting with ROS2.",
   "version": "1.0.1",
@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/eProsima/node-red-ros2-plugin.git"
+    "url": "https://github.com/EduArt-Robotik/edu_nodered_ros2_plugin.git"
   },
   "dependencies": {
     "cron": "~1.8.2",
@@ -78,12 +78,10 @@
       "DDS Settings": "src/dds-settings/dds-settings.js",
       "publisher": "src/publisher/publisher.js",
       "subscriber": "src/subscriber/subscriber.js",
-      "IDL Type": "src/idl-types/idl-types.js",
       "ROS 2 Type": "src/ros2-types/ros2-types.js",
       "ROS2 Inject": "src/ros2-message-inject/ros2-message-inject.js",
-      "FIWARE Publisher": "src/fiware_publisher/fiware_publisher.js",
-      "FIWARE Subscriber": "src/fiware_subscriber/fiware_subscriber.js",
-      "FIWARE Settings": "src/fiware-settings/fiware-settings.js"
+      "ROS2 Service Type": "src/ros2-service-types/ros2-service-types.js",
+      "Service Client": "src/service-client/service-client.js"
     }
   }
 }

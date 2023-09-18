@@ -144,160 +144,64 @@
 
     var types_dict = {'std::string' : 'str', 'char' : 'str', 'char16_t' : 'str', 'wchar_t' : 'str', 'float' : 'num', 'double' : 'num',
         'long double' : 'num', 'int8_t' : 'num', 'int16_t' : 'num', 'int32_t' : 'num', 'int64_t' : 'num', 'uint8_t' : 'num', 'uint16_t' : 'num',
-        'uint32_t' : 'num', 'uint64_t' : 'num', 'bool' : 'bool'};
+        'uint32_t' : 'num', 'uint64_t' : 'num', 'bool' : 'bool', "float32" : "num", "float64" : "num"};
+    var type_map = {'std::string' : 'str', 'char' : 'str', 'char16' : 'str', 'wchar' : 'str', 'float' : 'num', 'double' : 'num',
+        'long double' : 'num', 'int8' : 'num', 'int16' : 'num', 'int32' : 'num', 'int64' : 'num', 'uint8' : 'num', 'uint16' : 'num',
+        'uint32' : 'num', 'uint64' : 'num', 'bool' : 'bool', 'float32' : 'num', 'float64' : 'num', 'string' : 'str'};
     var containers = ['sequence', 'array', 'map', 'enum', 'union'];
 
     var custom_struct = {};
 
-    function processIDL(idl_str, pkg, msg, node, n) {
-
+    function processIDL(idl_str, pkg, msg, srv, node, n) {
+        console.log("processIDL");
+        console.log(idl_str);
+        console.log(pkg);
+        console.log(msg);
+        console.log(srv);
+        console.log(node);
+        console.log(n);
         var params = {};
         var type_name = "";
         var complete_name = "";
 
-        if (idl_str)
-        {
+        if (idl_str) {
             params['idl'] = idl_str;
             type_name = n.target.name;
             complete_name = n.target.name;
         }
-        else
-        {
+        else if (msg) {
             params['package'] = pkg;
             params['msg'] = msg;
             type_name = n.target.ros2message;
             complete_name = n.target.ros2pkg + "::msg::" + n.target.ros2message;
+            console.log("complete_name");
+            console.log(complete_name);
+        }
+        else if (srv) {
+            params['package'] = pkg;
+            params['srv'] = srv;
+            type_name = n.target.ros2service;
+            complete_name = n.target.ros2pkg + "::srv::" + n.target.ros2service;
+            console.log("complete_name");
+            console.log(complete_name);            
+        }
+        else {
+            console.log("No target given. --> Cancel processing of IDL.");
+            return;
         }
 
-        $.getJSON('getidl', params, function(idl)
-        {
-            //Array [[ 0: Struct name, 1: { member: type }], ...]
-            idl.forEach( function(struct)
-            {
-                if (struct[0] != type_name || !Object.keys(custom_struct).includes(struct[0]))
-                {
-                    custom_struct[struct[0]] = [];
-                }
-                Object.keys(struct[1]).forEach( function(member)
-                {
-                    var type = "";
-                    var default_value = "";
-                    var member_type = struct[1][member];
-
-                    // Basic Types
-                    if (Object.keys(types_dict).includes(member_type))
-                    {
-                        type = types_dict[member_type];
-                    }
-                    else
-                    {
-                        // container type_length_inner type
-                        var underscore_idx = member_type.indexOf('_');
-                        var container_type = member_type;
-                        if (underscore_idx != -1)
-                        {
-                            container_type = member_type.substr(0, underscore_idx);
-                        }
-                        switch (container_type)
-                        {
-                            case 'array':
-                            case 'sequence':
-                                member_type = member_type.substr(underscore_idx + 1);
-                                underscore_idx = member_type.indexOf('_');
-                                if (underscore_idx != -1)
-                                {
-                                    var length = member_type.substr(0, underscore_idx);
-                                    if (!isNaN(parseInt(length)))
-                                    {
-                                        member_type = member_type.substr(underscore_idx + 1);
-                                    }
-                                }
-                                type = 'json';
-                                default_value = "[]";
-                                break;
-                            case 'map':
-                            case 'enum':
-                            case 'union':
-                                type = 'json';
-                                default_value = "{}";
-                                break;
-                        }
-                    }
-
-                    // Main Struct Members
-                    if (complete_name == struct[0])
-                    {
-                        // Basic Types
-                        if (type != "")
-                        {
-                            var m = { p: member, v: default_value, vt: type, t: struct[1][member] };
-                            var old = node.props.filter(p => p.p == m.p && p.vt != m.vt);
-                            if (old.length > 0)
-                            {
-                                var idx = node.props.indexOf(old[0]);
-                                node.props.splice(idx, 1);
-                            }
-                            if (!node.props.some(p => p.p == m.p && p.vt == m.vt))
-                            {
-                                node.props.push(m);
-                            }
-                        }
-                        // Custom Types
-                        else if (type == "" && Object.keys(custom_struct).includes(member_type))
-                        {
-                            var is_container = containers.some(c => struct[1][member].includes(c));
-                            custom_struct[member_type].forEach( function(mem)
-                            {
-                                var aux = {};
-                                aux.p = mem.p; aux.t = mem.t;
-                                aux.v = (is_container && Object.keys(types_dict).includes(mem.t)) ? "[]" : mem.v;
-                                aux.vt = (is_container && Object.keys(types_dict).includes(mem.t)) ? "json" : mem.vt;
-                                aux.p = member + '.' + aux.p;
-
-                                var old = node.props.filter(p => p.p == aux.p && p.vt != aux.vt);
-                                if (old.length > 0)
-                                {
-                                    var idx = node.props.indexOf(old[0]);
-                                    node.props.splice(idx, 1);
-                                }
-                                if (!node.props.some(p => p.p == aux.p && p.vt == aux.vt))
-                                {
-                                    node.props.push(aux);
-                                }
-                            });
-                        }
-                    }
-                    // Custom Structures
-                    else if (complete_name != struct[0])
-                    {
-                        // Basic Types
-                        if (type != "")
-                        {
-                            custom_struct[struct[0]].push({ p: member, v: default_value, vt: type, t: struct[1][member]});
-                        }
-                        // Custom Types
-                        else if (type == "" && Object.keys(custom_struct).includes(member_type))
-                        {
-                            custom_struct[member_type].forEach( function(mem)
-                            {
-                                var aux = {};
-                                aux.p = mem.p; aux.v = mem.v; aux.vt = mem.vt; aux.t = mem.t;
-                                aux.p = member + '.' + aux.p;
-                                custom_struct[struct[0]].push(aux);
-                            });
-                        }
-                    }
-                });
+        $.getJSON('getinterface', params, function(type_list) {
+            console.log("get interfaces");
+            console.log("received type list:");
+            console.log(type_list);
+            console.log("length type list = " + type_list.length);
+            type_list.forEach( function(type) {
+                let m = { p: type['name'], v: "", vt: type_map[type['type']], t: type['type'] };
+                console.log("add entry:");
+                console.log(m);
+                node.props.push(m);
             });
-            // Add the type fields to the property container
-            if (idl_str)
-            {
-                custom_struct[Object.keys(custom_struct)[0]].forEach(p => $("#node-input-property-container").editableList('addItem', p));
-            }
-            else
-            {
-                node.props.forEach(p => $("#node-input-property-container").editableList('addItem', p));
-            }
+            node.props.forEach(p => $("#node-input-property-container").editableList('addItem', p));
         });
     }
 
@@ -456,11 +360,14 @@
             // Checks each link connected to this node
             RED.nodes.eachLink( function(n)
             {
+                console.log("each link");
                 if (n.source.id == node.id)
                 {
                     switch(n.target.type)
                     {
                         case "ROS2 Type":
+                            console.log(n.target.ros2pkg);
+                            console.log(n.target.ros2message);
                             if (n.target.validationErrors.length > 0)
                             {
                                 RED.notify("The type must be configured before", "error");
@@ -477,9 +384,31 @@
                                     node.props = [];
                                 }
 
-                                processIDL("", n.target.ros2pkg, n.target.ros2message, node, n);
+                                processIDL("", n.target.ros2pkg, n.target.ros2message, "", node, n);
                             }
                             break;
+                        case "ROS2 Service Type":
+                            console.log(n.target.ros2pkg);
+                            console.log(n.target.ros2service);
+                            if (n.target.validationErrors.length > 0)
+                            {
+                                RED.notify("The type must be configured before", "error");
+                            }
+                            else
+                            {
+                                if (node.idltype != "")
+                                {
+                                    node.idltype = "";
+                                }
+                                if (node.ros2type != n.target.ros2pkg + '/' + n.target.ros2service)
+                                {
+                                    node.ros2type = n.target.ros2pkg + '/' + n.target.ros2service;
+                                    node.props = [];
+                                }
+
+                                processIDL("", n.target.ros2pkg, "", n.target.ros2service, node, n);
+                            }
+                            break;                            
                         case "IDL Type":
                             if (n.target.validationErrors.length > 0)
                             {
@@ -497,7 +426,7 @@
                                     node.props = [];
                                 }
 
-                                processIDL(n.target.idltype, "", "", node, n);
+                                processIDL(n.target.idltype, "", "", "", node, n);
                             }
                             break;
                     }

@@ -1,11 +1,59 @@
 const { send } = require('process');
+const ros_node = require('../ros2/ros2-instance');
+const rclnodejs = require("rclnodejs");
+
+function get_qos_from_props (config)
+{
+    var qos = { "qos": {}};
+    config.forEach( function(q) {
+        var pos = q.p.indexOf('.');
+        if (pos != -1) {
+            var qos_type = q.p.substr(0, pos);
+            var param = q.p.substr(pos + 1);
+
+            if (!Object.keys(qos["qos"]).includes(qos_type)) {
+                qos["qos"][qos_type] = {};
+            }
+
+            pos = param.indexOf('.');
+
+            if (pos != -1) {
+                param = param.substr(pos + 1);
+            }
+
+            qos["qos"][qos_type][param] = q.v;
+        }
+        else
+        {
+            qos["qos"][q.p] = q.v;
+        }
+    });
+
+    qos_mapped = new rclnodejs.QoS();
+    if (qos['qos']['history'] != undefined && qos['qos']['history']['kind'] != undefined) {
+        qos_mapped.history = rclnodejs.QoS.HistoryPolicy['RMW_QOS_POLICY_HISTORY_' + qos['qos']['history']['kind']];
+    }
+    if (qos['qos']['reliability'] != undefined) {
+        qos_mapped.reliability = rclnodejs.QoS.ReliabilityPolicy['RMW_QOS_POLICY_RELIABILITY_' + qos['qos']['reliability']];
+    }
+    if (qos['qos']['durability'] != undefined) {
+        qos_mapped.durability = rclnodejs.QoS.DurabilityPolicy['RMW_QOS_POLICY_DURABILITY_' +  qos['qos']['durability']];
+    }
+    if (qos['qos']['history'] != undefined && qos['qos']['history']['depth'] != undefined) {
+        qos_mapped.depth = Number(qos['qos']['history']['depth']);
+    }
+    else {
+        qos_mapped.depth = 2;
+    }
+
+    return qos_mapped;
+};
+
 
 // RED argument provides the module access to Node-RED runtime api
 module.exports = function(RED)
 {
-    var events = require('events');
     var fs = require('fs');
-    var is_web_api = require('is-web-api').ros2;
     /*
      * @function SubscriberNode constructor
      * This node is defined by the constructor function SubscriberNode,
@@ -21,60 +69,53 @@ module.exports = function(RED)
         var node = this;
         node.ready = false;
 
-        node.status({fill: "yellow", shape: "dot", text: "Wait until Visual-ROS is ready to be used."});
-
-        if(config.domain)
-        {
+        // \todo handle domain id differently
+        if(config.domain) {
             // modify the global domain
             node.domain = RED.nodes.getNode(config.domain).domain;
-            is_web_api.set_dds_domain(node.domain);
         }
 
-        let {color, message} = is_web_api.add_subscriber(config['id'], config["topic"], config['selectedtype'],
-            config['props']);
-        if (message && color)
-        {
-            node.status({ fill: color, shape: "dot", text: message });
+        try {
+            console.log("creating subscription...");
+            console.log("type:")
+            console.log(config['selectedtype']);
+
+            qos = get_qos_from_props(config['props']);
+            console.log("uses following QoS:")
+            console.log(qos);
+
+            this.subscription = ros_node.node.createSubscription(
+                config['selectedtype'], config['topic'], { qos }, function(msg) {
+                    // Callback Function for Receiving a ROS Message
+                    node.status({ fill: "green", shape: "dot", text: "message received" });
+                    // Passes the message to the next node in the flow
+                    console.log("received message:");
+                    console.log(msg);
+                    node.send({ payload: msg });                    
+            });
+            node.ready = true;
+            node.status({ fill: "yellow", shape: "dot", text: "created"});
+            console.log("subscription was created successfully");
+        }
+        catch (error) {
+            console.log("creating subscription failed");
+            console.log(error);
+            node.ready = false;
+            node.status({ fill: "red", shape: "dot", text: "error"});
         }
 
         // Event emitted when the deploy is finished
         RED.events.once('flows:started', function() {
-            let {color, message, event_emitter} = is_web_api.launch(config['id']);
-            if (message && color)
-            {
-                node.status({ fill: color, shape: "dot", text: message});
-            }
-            if (event_emitter)
-            {
-                // Event emitted when a new message is received
-                event_emitter.on(config["topic"] + '_data', function(msg_json)
-                {
-                    node.status({ fill: "green", shape: "dot", text: "Message Received" });
-                    // Passes the message to the next node in the flow
-                    node.send(msg_json['msg']);
-                });
-
-                // Event emitted when the WebSocket Client is connected correctly
-                event_emitter.on('ROS2_connected', function()
-                {
-                    node.ready = true;
-                    node.status({ fill: null, shape: null, text: null});
-                });
-
-                event_emitter.on('IS-ERROR', function(status)
-                {
-                    node.ready = false;
-                    node.status(status);
-                });
+            if (node.ready) {
+                node.status({ fill: "green", shape: "dot", text: "waiting to receive message"});
             }
         });
 
         // Called when there is a re-deploy or the program is closed
-        node.on('close', function()
-        {
-            // Stops the IS execution and resets the yaml
-            is_web_api.stop();
-            is_web_api.new_config();
+        node.on('close', function() {
+            ros_node.node.destroySubscription(this.subscription);
+            this.subscription = null;
+            node.status({ fill: null, shape: null, text: ""});
         });
     }
 

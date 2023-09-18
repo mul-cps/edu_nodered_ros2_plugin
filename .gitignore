@@ -40,3 +40,4 @@ coverage/
 .next
 push.sh
 package-lock.json
+.vscode
