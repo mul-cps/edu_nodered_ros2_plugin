@@ -62,10 +62,10 @@ module.exports = function(RED)
                 // service is available and ready
                 node.status({ fill: "green", shape: "dot", text: "request published"});
 
-                this.client.sendRequest(msg, function(response) {
+                this.client.sendRequest(msg.payload, function(response) {
                     // Passes the message to the next node in the flow
                     node.status({ fill: "green", shape: "dot", text: "response received"});
-                    node.send(response);
+                    node.send({ payload: response });
                 });
             }
             else {
