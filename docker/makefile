@@ -1,4 +1,4 @@
-image_name = eduart-nodered:0.2.0
+image_name = eduart-nodered:0.2.1
 
 download-sources:
 	git clone --branch feature/my-on-plugin-with-black-jack-and-hookers https://github.com/EduArt-Robotik/edu_nodered_ros2_plugin.git
