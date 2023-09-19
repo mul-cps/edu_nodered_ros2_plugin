@@ -154,12 +154,7 @@
 
     function processIDL(idl_str, pkg, msg, srv, node, n) {
         console.log("processIDL");
-        console.log(idl_str);
-        console.log(pkg);
-        console.log(msg);
-        console.log(srv);
-        console.log(node);
-        console.log(n);
+
         var params = {};
         var type_name = "";
         var complete_name = "";
@@ -201,6 +196,19 @@
                 console.log(m);
                 node.props.push(m);
             });
+
+            // Copy previous value if prop already got an value assigned.
+            console.log("old props:");
+            console.log(node.old_props);
+            console.log("new props:");
+            console.log(node.new_props);
+            for (let old_prop in node.old_props) {
+                for (let new_prop in node.props) {
+                    if (old_prop.p == new_prop.p) {
+                        new_prop.v = old_prop.v;
+                    }
+                }
+            }
             node.props.forEach(p => $("#node-input-property-container").editableList('addItem', p));
         });
     }
@@ -384,7 +392,9 @@
                                     node.props = [];
                                 }
 
+                                node.old_props = [...node.props];
                                 processIDL("", n.target.ros2pkg, n.target.ros2message, "", node, n);
+                                node.old_props = [];
                             }
                             break;
                         case "ROS2 Service Type":
@@ -406,7 +416,9 @@
                                     node.props = [];
                                 }
 
+                                node.old_props = [...node.props];
                                 processIDL("", n.target.ros2pkg, "", n.target.ros2service, node, n);
+                                node.old_props = [];
                             }
                             break;                            
                         case "IDL Type":
@@ -426,7 +438,9 @@
                                     node.props = [];
                                 }
 
+                                node.old_props = [...node.props];
                                 processIDL(n.target.idltype, "", "", "", node, n);
+                                node.old_props = [];
                             }
                             break;
                     }
