@@ -2,6 +2,8 @@
 module.exports = function(RED)
 {
     var execFile = require('child_process').execFile;    
+    var package_list = [];
+    var interface_list = [];
 
     /*
      * @function ROS2ServiceTypes constructor
@@ -40,10 +42,18 @@ module.exports = function(RED)
     // Function that pass the IS ROS 2 compiled packages to the html file
     RED.httpAdmin.get("/ros2srvspackages", RED.auth.needsPermission('ROS2 Service Type.read'), function(req,res)
     {
+        if (package_list.length > 0) {
+            // Uses previous estimated message package list.
+            console.log("uses previous estimated service package list:");
+            console.log(package_list);
+            res.json(package_list);
+            return;
+        }
+
         console.log("Estimate all packages that provide services.");
         execFile("ros2", ["interface", "list"], function(error, stdout, stderr) {    
             var found_service_start = false;
-            var package_list = [];
+            // var package_list = [];
             
             stdout.split('\n').forEach(line => {
                 if (found_service_start == false && line.includes("Services:")) {
@@ -78,6 +88,14 @@ module.exports = function(RED)
     // Function that pass the IS ROS 2 package compiled msgs to the html file
     RED.httpAdmin.get("/ros2srvs", RED.auth.needsPermission('ROS2 Service Type.read'), function(req,res)
     {
+        if (interface_list[req.query["package"]] != undefined) {
+            // Uses previous estimated message list.
+            console.log("uses already estimated service list:");
+            console.log(interface_list[req.query["package"]]);
+            res.json(interface_list[req.query["package"]]);
+            return;
+        }
+
         console.log("Estimate all services that is provided by package '" + req.query["package"] + "':");
         execFile("ros2", ["interface", "list"], function(error, stdout, stderr) {    
             var found_service_start = false;
@@ -109,6 +127,7 @@ module.exports = function(RED)
 
             console.log("Found following services that is provided by package '" + req.query["package"] + "':");
             console.log(service_list);
+            interface_list[req.query["package"]] = service_list;            
             res.json(service_list);
         });
     });

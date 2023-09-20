@@ -3,11 +3,7 @@ module.exports = function(RED)
 {
     var execFile = require('child_process').execFile;
     var cron = require('cron');
-    var fs = require('fs');
-    var ros2_home = '/opt/ros/' + process.env.ROS_DISTRO;
-    if (process.env.IS_ROS2_PATH) {
-        ros2_home = process.env.IS_ROS2_PATH;
-    }
+    var interface_list = [];
 
     /*
      * @function ROS2InjectNode constructor
@@ -174,7 +170,7 @@ module.exports = function(RED)
         console.log("Try to get interface:");
         var interface_name = "";
         var type_list = [];
-
+    
         if (req.query['msg']) {
             interface_name = req.query['package'] + "/msg/" + req.query['msg'];
         }
@@ -186,6 +182,16 @@ module.exports = function(RED)
             return;
         }
         console.log("interface name = " + interface_name);
+
+        // If already estimated use existing entry.
+        if (interface_list[interface_name] != undefined) {
+            console.log("uses already estimated type list:");
+            console.log(interface_list[interface_name]);
+            res.json(interface_list[interface_name]);
+            return;
+        }
+
+        // No interface entry found --> estimate it...
         execFile("ros2", ["interface", "show", interface_name], function(error, stdout, stderr) {
             // handle special case ROS service
             if (req.query['srv']) {
@@ -271,13 +277,8 @@ module.exports = function(RED)
             console.log("found type list:");
             type_list.shift();
             console.log(type_list);
+            interface_list[interface_name] = type_list;
             res.json(type_list);
-            // console.log("res:\n" + res);
-
-            // console.log("DEBUG OUTPUT");
-            // console.log(stdout);
-            // console.log(stderr);
-            // console.log(error);
         });
     })
 }
