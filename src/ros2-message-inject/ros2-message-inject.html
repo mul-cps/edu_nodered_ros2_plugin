@@ -192,7 +192,7 @@
             console.log(type_list);
 
             type_list.forEach( function(type) {
-                let m = { p: type['name'], v: "", vt: type_map[type['type']], t: type['type'] };
+                let m = { p: type['name'], v: "", vt: type['type'].includes("[") ? "json" : type_map[type['type']], t: type['type'] };
                 console.log("add entry:");
                 console.log(m);
                 node.props.push(m);
@@ -293,14 +293,13 @@
                                     new_mem = old_value + ',';
                                 }
                                 var json = {};
-                                custom_struct[n].forEach( function(mem)
-                                {
+                                custom_struct[n].forEach( function(mem) {
                                     var index = mem.p.indexOf('.');
                                     var previous_idx = 0;
                                     var level = json;
                                     var level_name = mem.p;
-                                    while (index != -1)
-                                    {
+
+                                    while (index != -1) {
                                         level_name = mem.p.substr(previous_idx, index - previous_idx);
                                         if (!Object.keys(level).includes(level_name)){
                                             level[level_name] = {};
@@ -309,13 +308,11 @@
                                         previous_idx = index + 1;
                                         index = mem.p.indexOf('.', previous_idx);
 
-                                        if (index == -1)
-                                        {
+                                        if (index == -1) {
                                             level_name = mem.p.substr(previous_idx);
                                         }
                                     }
-                                    switch(mem.vt)
-                                    {
+                                    switch(mem.vt) {
                                         case 'str':
                                             level[level_name] = ""; break;
                                         case 'num':
@@ -390,9 +387,9 @@
                                 {
                                     node.idltype = "";
                                 }
-                                if (node.ros2type != n.target.ros2pkg + '/' + n.target.ros2message)
+                                if (node.ros2type != n.target.ros2pkg + '/msg/' + n.target.ros2message)
                                 {
-                                    node.ros2type = n.target.ros2pkg + '/' + n.target.ros2message;
+                                    node.ros2type = n.target.ros2pkg + '/msg/' + n.target.ros2message;
                                     node.props = [];
                                 }
 
@@ -413,9 +410,9 @@
                                 {
                                     node.idltype = "";
                                 }
-                                if (node.ros2type != n.target.ros2pkg + '/' + n.target.ros2service)
+                                if (node.ros2type != n.target.ros2pkg + '/srv/' + n.target.ros2service)
                                 {
-                                    node.ros2type = n.target.ros2pkg + '/' + n.target.ros2service;
+                                    node.ros2type = n.target.ros2pkg + '/srv/' + n.target.ros2service;
                                     node.props = [];
                                 }
 

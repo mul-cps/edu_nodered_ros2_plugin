@@ -271,6 +271,10 @@ module.exports = function(RED)
 
                 console.log("type_name = " + type_name);
                 console.log("type = " + type);
+                if (type.includes("[") && type.includes("]")) {
+                    // type is an array
+                    type = "json";
+                }
             });
 
             type_list.push({ 'type': type, 'name': type_name });
