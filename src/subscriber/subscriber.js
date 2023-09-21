@@ -23,8 +23,7 @@ function get_qos_from_props (config)
 
             qos["qos"][qos_type][param] = q.v;
         }
-        else
-        {
+        else {
             qos["qos"][q.p] = q.v;
         }
     });
@@ -37,7 +36,7 @@ function get_qos_from_props (config)
         qos_mapped.reliability = rclnodejs.QoS.ReliabilityPolicy['RMW_QOS_POLICY_RELIABILITY_' + qos['qos']['reliability']];
     }
     if (qos['qos']['durability'] != undefined) {
-        qos_mapped.durability = rclnodejs.QoS.DurabilityPolicy['RMW_QOS_POLICY_DURABILITY_' +  qos['qos']['durability']];
+        qos_mapped.durability = rclnodejs.QoS.DurabilityPolicy['RMW_QOS_POLICY_DURABILITY_' + qos['qos']['durability']];
     }
     if (qos['qos']['history'] != undefined && qos['qos']['history']['depth'] != undefined) {
         qos_mapped.depth = Number(qos['qos']['history']['depth']);
@@ -77,11 +76,11 @@ module.exports = function(RED)
 
         try {
             console.log("creating subscription...");
-            console.log("type:")
+            console.log("type:");
             console.log(config['selectedtype']);
 
             qos = get_qos_from_props(config['props']);
-            console.log("uses following QoS:")
+            console.log("uses following QoS:");
             console.log(qos);
 
             this.subscription = ros_node.node.createSubscription(
@@ -91,7 +90,7 @@ module.exports = function(RED)
                     // Passes the message to the next node in the flow
                     console.log("received message:");
                     console.log(msg);
-                    node.send({ payload: msg });                    
+                    node.send({ payload: msg });
             });
             node.ready = true;
             node.status({ fill: "yellow", shape: "dot", text: "created"});

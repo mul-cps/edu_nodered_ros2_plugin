@@ -295,7 +295,7 @@
                 case "Subscriber":
                 case "FIWARE Publisher":
                 case "FIWARE Subscriber":
-                    const selectedtype = link.source.ros2pkg + '/' + link.source.ros2message;
+                    const selectedtype = link.source.ros2pkg + '/msg/' + link.source.ros2message;
                     if (selectedtype !== '/')
                     {
                         link.target.selectedtype = selectedtype;
