@@ -38,13 +38,11 @@
     "ros2",
     "node-red",
     "contrib",
-    "fiware",
-    "ngsi",
-    "eProsima",
     "context",
     "process",
     "data",
-    "json"
+    "json",
+    "EduArt"
   ],
   "husky": {
     "hooks": {
@@ -76,10 +74,10 @@
   "node-red": {
     "nodes": {
       "DDS Settings": "src/dds-settings/dds-settings.js",
+      "ROS2 Inject": "src/ros2-message-inject/ros2-message-inject.js",
       "publisher": "src/publisher/publisher.js",
       "subscriber": "src/subscriber/subscriber.js",
       "ROS 2 Type": "src/ros2-types/ros2-types.js",
-      "ROS2 Inject": "src/ros2-message-inject/ros2-message-inject.js",
       "ROS2 Service Type": "src/ros2-service-types/ros2-service-types.js",
       "Service Client": "src/service-client/service-client.js",
       "ROS2 Action Type": "src/ros2-action-types/ros2-action-types.js",

@@ -1,5 +1,5 @@
 const ros_node = require('../ros2/ros2-instance');
-const rclnodejs = require("rclnodejs");
+const { rclnodejs, ActionClient } = require("rclnodejs");
 
 // RED argument provides the module access to Node-RED runtime api
 module.exports = function(RED)
@@ -27,14 +27,15 @@ module.exports = function(RED)
         }
 
         try {
-            console.log("creating service client...");
+            console.log("creating action client...");
             console.log("type:")
             console.log(config['selectedtype']);
 
-            this.client = ros_node.node.createClient(config['selectedtype'], config['topic'])
+            this.action_client = new ActionClient(ros_node.node, config['selectedtype'], config['topic']);
+
             node.ready = true;
             node.status({ fill: "yellow", shape: "dot", text: "created"});
-            console.log("service client was created successfully");
+            console.log("action client was created successfully");
         }
         catch (error) {
             console.log("creating subscription failed");
@@ -46,7 +47,7 @@ module.exports = function(RED)
         // Event emitted when the deploy is finished
         RED.events.once('flows:started', function() {
             if (node.ready) {
-                node.status({ fill: "green", shape: "dot", text: "waiting to request service"});
+                node.status({ fill: "green", shape: "dot", text: "waiting to request action"});
             }
         });
 
@@ -54,19 +55,12 @@ module.exports = function(RED)
         // which will be called whenever a message arrives at this node
         node.on('input', function(msg) {
             if (node.ready) {
-                if (this.client.isServiceServerAvailable() == false) {
-                    node.status({ fill: "yellow", shape: "dot", text: "service not available"});
+                if (this.action_client.isActionServerAvailable() == false) {
+                    node.status({ fill: "yellow", shape: "dot", text: "action not available"});
                     return;
                 }
 
-                // service is available and ready
-                node.status({ fill: "green", shape: "dot", text: "request published"});
-
-                this.client.sendRequest(msg.payload, function(response) {
-                    // Passes the message to the next node in the flow
-                    node.status({ fill: "green", shape: "dot", text: "response received"});
-                    node.send({ payload: response });
-                });
+                performing_action(node, msg.payload);
             }
             else {
                done("node was not ready to process flow data");
@@ -75,10 +69,49 @@ module.exports = function(RED)
 
         // Called when there is a re-deploy or the program is closed
         node.on('close', function() {
-            ros_node.node.destroyClient(this.client);
-            this.client = null;
+            this.action_client.destroy();
+            this.action_client = null;
             node.status({ fill: null, shape: null, text: ""});
         });
+    }
+
+    // performing action
+    async function performing_action(node, goal_request)
+    {
+        console.log("goal_request:");
+        console.log(goal_request);
+        try {
+            // service is available and ready
+            const goal_handle = await node.action_client.sendGoal(goal_request, function(feedback) {
+                // Passes the message to the next node in the flow
+                node.status({ fill: "green", shape: "dot", text: "action is processing"});
+                node.send({ }, { payload: feedback });
+            });
+        
+            node.status({ fill: "green", shape: "dot", text: "goal request published"});
+            
+            if (goal_handle.isAccepted() == false) {
+                node.status({ fill: "red", shape: "dot", text: "gaol request rejected"});
+                return;
+            }
+
+            console.log("action goal was accepted");
+            const result = await goal_handle.getResult();
+            console.log("received action result");
+
+            if (goal_handle.isSucceeded() == false) {
+                node.status({ fill: "red", shape: "dot", text: "gaol failed"});
+                return;
+            }
+
+            node.status({ fill: "green", shape: "dot", text: "result received"});
+            node.send({ payload: result }, { });
+        }
+        catch (error) {
+            console.log("sending goal request failed. error:");
+            console.log(error);
+            node.status({ fill: "red", shape: "dot", text: "sending gaol request failed"});
+        }     
     }
 
     // The node is registered in the runtime using the name "Action Client"
