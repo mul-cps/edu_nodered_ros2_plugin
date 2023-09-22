@@ -247,10 +247,7 @@
                 {
                     switch(n.target.type)
                     {
-                        case "Publisher":
-                        case "Subscriber":
-                        case "FIWARE Publisher":
-                        case "FIWARE Subscriber":
+                        case "Service Client":
                             const selectedtype = node.ros2pkg + '/srv/' + node.ros2service;
                             if (selectedtype !== '/')
                             {

@@ -1,5 +1,5 @@
 <!--Properties that can be configured for this node-->
-<script type="text/html" data-template-name="ROS2 Type">
+<script type="text/html" data-template-name="ROS2 Action Type">
     <div class="form-row">
         <label for="node-input-ros2package"><i class="fa fa-archive"></i>&nbsp;&nbsp; Package</label>
         <select id="node-input-ros2package-select">
@@ -9,10 +9,10 @@
     </div>
     <div class="form-row">
         <label for="node-input-ros2msg"><i class="fa fa-envelope"></i>&nbsp;&nbsp; Message </label>
-        <select id="node-input-ros2msg-select">
+        <select id="node-input-ros2srv-select">
 	        <option value=""></option>
 	    </select>
-        <input id="node-input-ros2message" type="hidden">
+        <input id="node-input-ros2action" type="hidden">
     </div>
 
     <div class="form-row" id="editors">
@@ -43,27 +43,27 @@
 
 <!--Node style definition-->
 <script type="text/javascript">
-    RED.nodes.registerType('ROS2 Type',
+    RED.nodes.registerType('ROS2 Action Type',
     {
         category: 'ROS 2',
         color: "#fdd0a2",
         defaults:
         {
             ros2pkg: {value: "", required: true},
-            ros2message: {value: "", required: true}
+            ros2action: {value: "", required: true}
         },
         inputs: 1,
         outputs: 1,
         icon: "ros2-icon.svg",
         label: function()
         {
-            if (this.ros2pkg && this.ros2message)
+            if (this.ros2pkg && this.ros2action)
             {
-                return this.ros2pkg + '/' + this.ros2message;
+                return this.ros2pkg + '/' + this.ros2action;
             }
             else
             {
-                return "ROS2 Type";
+                return "ROS2 Action Type";
             }
         },
         oneditprepare: function()
@@ -71,16 +71,16 @@
             var node = this;
             console.log("oneditprepare");
             console.log(this.ros2pkg);
-            console.log(this.ros2message);
+            console.log(this.ros2action);
             if (this.ros2pkg)
             {
                 $("#node-input-ros2package-select").empty();
                 $("<option value='" + this.ros2pkg + "'>" + this.ros2pkg + "</option>").appendTo("#node-input-ros2package-select");
             }
-            if (this.ros2message)
+            if (this.ros2action)
             {
-                $("#node-input-ros2msg-select").empty();
-                $("<option value='" + this.ros2message + "'>" + this.ros2message + "</option>").appendTo("#node-input-ros2msg-select");
+                $("#node-input-ros2srv-select").empty();
+                $("<option value='" + this.ros2action + "'>" + this.ros2action + "</option>").appendTo("#node-input-ros2srv-select");
             }
 
             var buildEditor = function(id, value, defaultValue) {
@@ -127,8 +127,9 @@
                 if (!$("#node-input-ros2package-select").is(":focus"))
                 {
                     //Gets the IS ROS 2 compiled packages and add them to the packages selector
-                    $.getJSON('ros2msgspackages', function(data)
+                    $.getJSON('ros2srvspackages', function(data)
                     {
+                        console.log(data);
                         $("#node-input-ros2package-select").empty();
                         $("<option></option>").appendTo("#node-input-ros2package-select");
                         $.each(data, function(i, package)
@@ -143,14 +144,14 @@
             //to the messages selector
             $("#node-input-ros2package-select").change(function()
             {
-                $.getJSON('ros2msgs', { package: $("#node-input-ros2package-select").val().toString() },  function(set)
+                $.getJSON('ros2srvs', { package: $("#node-input-ros2package-select").val().toString() },  function(set)
                 {
-                    $("#node-input-ros2msg-select").empty();
-                    $("<option></option>").appendTo("#node-input-ros2msg-select");
+                    $("#node-input-ros2srv-select").empty();
+                    $("<option></option>").appendTo("#node-input-ros2srv-select");
                     $.each(set, function(i, message)
                     {
                         message = message.replace('.mix', '');
-                        $("<option value='" + message + "'>" + message + "</option>").appendTo("#node-input-ros2msg-select");
+                        $("<option value='" + message + "'>" + message + "</option>").appendTo("#node-input-ros2srv-select");
                     });
                 });
             });
@@ -165,23 +166,23 @@
                 $("#idl-editor").toggle();
             });
 
-            $("#node-input-ros2msg-select").mousedown(function () {
-                if (!$("#node-input-ros2msg-select").is(":focus"))
+            $("#node-input-ros2srv-select").mousedown(function () {
+                if (!$("#node-input-ros2srv-select").is(":focus"))
                 {
-                    $.getJSON('ros2msgs', { package: $("#node-input-ros2package-select").val().toString() },  function(set)
+                    $.getJSON('ros2srvs', { package: $("#node-input-ros2package-select").val().toString() },  function(set)
                     {
-                        $("#node-input-ros2msg-select").empty();
-                        $("<option></option>").appendTo("#node-input-ros2msg-select");
+                        $("#node-input-ros2srv-select").empty();
+                        $("<option></option>").appendTo("#node-input-ros2srv-select");
                         $.each(set, function(i, message)
                         {
                             message = message.replace('.mix', '');
-                            $("<option value='" + message + "'>" + message + "</option>").appendTo("#node-input-ros2msg-select");
+                            $("<option value='" + message + "'>" + message + "</option>").appendTo("#node-input-ros2srv-select");
                         });
                     });
                 }
             });
 
-            $("#node-input-ros2msg-select").change(function()
+            $("#node-input-ros2srv-select").change(function()
             {
                 this.message = {};
                 if (!this.initEditor)
@@ -200,11 +201,11 @@
 
                 var n = this;
 
-                $.getJSON('msgidl', { package: $("#node-input-ros2package-select").val().toString(),
-                    msg: $("#node-input-ros2msg-select").val().toString() },  function(msg)
+                $.getJSON('srvidl', { package: $("#node-input-ros2package-select").val().toString(),
+                    msg: $("#node-input-ros2srv-select").val().toString() },  function(msg)
                 {
                     n.editor.getSession().getDocument().setValue(msg["idl"]);
-                    n.initEditor.getSession().getDocument().setValue(msg["msg"]);
+                    n.initEditor.getSession().getDocument().setValue(msg["srv"]);
 
                     $("#button-msg-editor").show();
                     $("#button-idl-editor").show();
@@ -231,13 +232,13 @@
             });
 
             node.ros2pkg = $("#node-input-ros2package-select").val().toString();
-            node.ros2message = $("#node-input-ros2msg-select").val().toString();
+            node.ros2action = $("#node-input-ros2srv-select").val().toString();
             console.log("oneditsave");
             console.log(node.ros2pkg);
-            console.log(node.ros2message);
+            console.log(node.ros2action);
 
             $("#node-input-ros2pkg").val(node.ros2pkg);
-            $("#node-input-ros2message").val(node.ros2message);
+            $("#node-input-ros2action").val(node.ros2action);
 
             // Update the associated endpoint nodes
             RED.nodes.eachLink( function(n)
@@ -246,9 +247,8 @@
                 {
                     switch(n.target.type)
                     {
-                        case "Publisher":
-                        case "Subscriber":
-                            const selectedtype = node.ros2pkg + '/msg/' + node.ros2message;
+                        case "Action Client":
+                            const selectedtype = node.ros2pkg + '/action/' + node.ros2action;
                             if (selectedtype !== '/')
                             {
                                 n.target.selectedtype = selectedtype;
@@ -285,7 +285,7 @@
 
     // Event emitted when a link is created
     RED.events.on("links:add", function(link) {
-        if (link.source.type == 'ROS2 Type')
+        if (link.source.type == 'ROS2 Action Type')
         {
             switch(link.target.type)
             {
@@ -293,7 +293,7 @@
                 case "Subscriber":
                 case "FIWARE Publisher":
                 case "FIWARE Subscriber":
-                    const selectedtype = link.source.ros2pkg + '/msg/' + link.source.ros2message;
+                    const selectedtype = link.source.ros2pkg + '/srv/' + link.source.ros2action;
                     if (selectedtype !== '/')
                     {
                         link.target.selectedtype = selectedtype;
@@ -306,8 +306,8 @@
 </script>
 
 <!--Help text shown for the ros2-type node-->
-<script type="text/html" data-help-name="ROS2 Type">
-    <p> This node represents a specific ROS 2 Built-in Type. </p>
+<script type="text/html" data-help-name="ROS2 Action Type">
+    <p> This node represents a specific ROS 2 Actions installed and sourced on this system. </p>
     <h3>Settings</h3>
         <dl class="message-properties">
         <dt>Package<span class="property-type"></span></dt>

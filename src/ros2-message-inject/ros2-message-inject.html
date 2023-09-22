@@ -152,7 +152,7 @@
 
     var custom_struct = {};
 
-    function processIDL(idl_str, pkg, msg, srv, node, n) {
+    function processIDL(idl_str, pkg, msg, srv, action, node, n) {
         console.log("processIDL");
 
         var params = {};
@@ -181,6 +181,14 @@
             console.log("complete_name");
             console.log(complete_name);            
         }
+        else if (action) {
+            params['package'] = pkg;
+            params['action'] = action;
+            type_name = n.target.ros2action;
+            complete_name = n.target.ros2pkg + "::action::" + n.target.ros2action;
+            console.log("complete_name");
+            console.log(complete_name);            
+        }        
         else {
             console.log("No target given. --> Cancel processing of IDL.");
             return;
@@ -379,7 +387,7 @@
                             console.log(n.target.ros2message);
                             if (n.target.validationErrors.length > 0)
                             {
-                                RED.notify("The type must be configured before", "error");
+                                RED.notify("The message type must be configured before", "error");
                             }
                             else
                             {
@@ -393,7 +401,7 @@
                                     node.props = [];
                                 }
 
-                                processIDL("", n.target.ros2pkg, n.target.ros2message, "", node, n);
+                                processIDL("", n.target.ros2pkg, n.target.ros2message, "", "", node, n);
                                 node.old_props = [];
                             }
                             break;
@@ -402,7 +410,7 @@
                             console.log(n.target.ros2service);
                             if (n.target.validationErrors.length > 0)
                             {
-                                RED.notify("The type must be configured before", "error");
+                                RED.notify("The service type must be configured before", "error");
                             }
                             else
                             {
@@ -416,28 +424,30 @@
                                     node.props = [];
                                 }
 
-                                processIDL("", n.target.ros2pkg, "", n.target.ros2service, node, n);
+                                processIDL("", n.target.ros2pkg, "", n.target.ros2service, "", node, n);
                                 node.old_props = [];
                             }
                             break;                            
-                        case "IDL Type":
+                            case "ROS2 Service Type":
+                            console.log(n.target.ros2pkg);
+                            console.log(n.target.ros2service);
                             if (n.target.validationErrors.length > 0)
                             {
-                                RED.notify("The type must be configured before", "error");
+                                RED.notify("The action type must be configured before", "error");
                             }
                             else
                             {
-                                if (node.ros2type != "")
+                                if (node.idltype != "")
                                 {
-                                    node.ros2type = "";
+                                    node.idltype = "";
                                 }
-                                if (node.idltype != n.target.name)
+                                if (node.ros2type != n.target.ros2pkg + '/action/' + n.target.ros2action)
                                 {
-                                    node.idltype = n.target.name;
+                                    node.ros2type = n.target.ros2pkg + '/action/' + n.target.ros2action;
                                     node.props = [];
                                 }
 
-                                processIDL(n.target.idltype, "", "", "", node, n);
+                                processIDL("", n.target.ros2pkg, "", "", n.target.ros2action, node, n);
                                 node.old_props = [];
                             }
                             break;
