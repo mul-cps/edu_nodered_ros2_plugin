@@ -50,7 +50,7 @@ module.exports = function(RED)
             return;
         }
 
-        console.log("Estimate all packages that provide services.");
+        console.log("Estimate all packages that provide actions.");
         execFile("ros2", ["interface", "list"], function(error, stdout, stderr) {    
             var found_service_start = false;
             
@@ -61,7 +61,12 @@ module.exports = function(RED)
                     return;
                 }
                 if (found_service_start == false) {
-                    // no services --> no processing
+                    // no action --> no processing
+                    return;
+                }
+                if (found_service_start == true && line.includes("/") == false) {
+                    // end of services reached --> stop processing
+                    found_service_start = false;
                     return;
                 }
 
@@ -73,13 +78,13 @@ module.exports = function(RED)
                 }
             });
 
-            console.log("Found following packages that provide services:");
+            console.log("Found following packages that provide actions:");
             console.log(package_list);
             res.json(package_list);
         });
     });
 
-    // Function that pass the IS ROS 2 package compiled msgs to the html file
+    // Function that pass the IS ROS 2 package compiled actions to the html file
     RED.httpAdmin.get("/ros2actions", RED.auth.needsPermission('ROS2 Action Type.read'), function(req,res)
     {
         if (interface_list[req.query["package"]] != undefined) {

@@ -82,8 +82,8 @@
       "ROS2 Inject": "src/ros2-message-inject/ros2-message-inject.js",
       "ROS2 Service Type": "src/ros2-service-types/ros2-service-types.js",
       "Service Client": "src/service-client/service-client.js",
-      "Action Client": "src/action-client/action-client.js",
-      "ROS2 Action Type": "src/ros2-action-types/ros2-action-types.js"
+      "ROS2 Action Type": "src/ros2-action-types/ros2-action-types.js",
+      "Action Client": "src/action-client/action-client.js"
     }
   }
 }

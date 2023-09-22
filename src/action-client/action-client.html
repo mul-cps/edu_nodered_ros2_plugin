@@ -87,7 +87,7 @@
                 {
                     switch(n.source.type)
                     {
-                        case "ROS2 Type":
+                        case "ROS2 Action Type":
                             linked = true;
                             if (n.source.validationErrors.length > 0)
                             {
@@ -95,41 +95,11 @@
                             }
                             else
                             {
-                                const selectedtype = n.source.ros2pkg + '/msg/' + n.source.ros2message;
+                                const selectedtype = n.source.ros2pkg + '/action/' + n.source.ros2action;
                                 console.log("selected type: " + selectedtype);
                                 if (selectedtype !== '/')
                                 {
                                     node.selectedtype = selectedtype;
-                                }
-                            }
-                            break;
-                        case "ROS2 Service Type":
-                            linked = true;
-                            if (n.source.validationErrors.length > 0)
-                            {
-                                RED.notify("The type must be configured before", "error");
-                            }
-                            else
-                            {
-                                const selectedtype = n.source.ros2pkg + '/srv/' + n.source.ros2service;
-                                console.log("selected type: " + selectedtype);
-                                if (selectedtype !== '/')
-                                {
-                                    node.selectedtype = selectedtype;
-                                }
-                            }
-                            break;                            
-                        case "IDL Type":
-                            linked = true;
-                            if (n.source.validationErrors.length > 0)
-                            {
-                                RED.notify("The type must be configured before", "error");
-                            }
-                            else
-                            {
-                                if (n.source.name)
-                                {
-                                    node.selectedtype = n.source.name;
                                 }
                             }
                             break;
@@ -139,7 +109,7 @@
 
             if(!linked)
             {
-                RED.notify("The subscriber must be connected to a type", "error");
+                RED.notify("The action client must be connected to an action type", "error");
             }
 
             $(".red-ui-tray-content form").width("615px");
@@ -285,7 +255,7 @@
 
 <!--Help text shown for the ROS2 Action Client node-->
 <script type="text/html" data-help-name="Action Client">
-    <p>This node represents a ROS 2 action client. It is able of subscribe to a specific topic and receive all the messages published on it.</p>
+    <p>This node represents a ROS 2 action client. It is able of subscribe to a specific action and receive all the messages published on it.</p>
     <h3>Settings</h3>
         <p>By using this node, you can configure the following ROS 2 settings: </p>
         <dl class="message-properties">

@@ -177,8 +177,11 @@ module.exports = function(RED)
         else if (req.query['srv']) {
             interface_name = req.query['package'] + "/srv/" + req.query['srv'];
         }
+        else if (req.query['action']) {
+            interface_name = req.query['package'] + "/action/" + req.query['action'];
+        }
         else {
-            console.log("Missing 'msg' or 'srv' in getinterface request.");
+            console.log("Missing 'msg', 'srv' or 'action' in getinterface request.");
             return;
         }
         console.log("interface name = " + interface_name);
@@ -194,11 +197,18 @@ module.exports = function(RED)
         // No interface entry found --> estimate it...
         execFile("ros2", ["interface", "show", interface_name], function(error, stdout, stderr) {
             // handle special case ROS service
-            if (req.query['srv']) {
+            if (req.query['srv'] != undefined) {
                 // get request type only
                 stdout = stdout.split('---')[0];
                 console.log("picked request part only:");
                 console.log(stdout);
+            }
+            // handle special case ROS actions
+            else if (req.query['action'] != undefined) {
+                // get goal request type only
+                stdout = stdout.split('---')[0];
+                console.log("picked goal request part only:");
+                console.log(stdout);                
             }
 
             type_indent = 0;
