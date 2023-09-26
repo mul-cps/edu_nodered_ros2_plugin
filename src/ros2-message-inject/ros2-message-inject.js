@@ -1,8 +1,8 @@
 // RED argument provides the module access to Node-RED runtime api
 module.exports = function(RED)
 {
-    var execFile = require('child_process').execFile;
-    var cron = require('cron');
+    const execFile = require('child_process').execFile;
+    const cron = require('cron');
     var interface_list = [];
 
     /*

@@ -1,7 +1,7 @@
 // RED argument provides the module access to Node-RED runtime api
 module.exports = function(RED)
 {
-    var execFile = require('child_process').execFile;    
+    const execFile = require('child_process').execFile;    
     var package_list = [];
     var interface_list = [];
 

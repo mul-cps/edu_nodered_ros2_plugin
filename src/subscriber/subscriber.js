@@ -1,5 +1,4 @@
-const { send } = require('process');
-const ros_node = require('../ros2/ros2-instance');
+const { Ros2Instance } = require('../ros2/ros2-instance');
 const rclnodejs = require("rclnodejs");
 
 function get_qos_from_props (config)
@@ -83,7 +82,7 @@ module.exports = function(RED)
             console.log("uses following QoS:");
             console.log(qos);
 
-            this.subscription = ros_node.node.createSubscription(
+            this.subscription = Ros2Instance.instance().node.createSubscription(
                 config['selectedtype'], config['topic'], { qos }, function(msg) {
                     // Callback Function for Receiving a ROS Message
                     node.status({ fill: "green", shape: "dot", text: "message received" });
@@ -112,7 +111,7 @@ module.exports = function(RED)
 
         // Called when there is a re-deploy or the program is closed
         node.on('close', function() {
-            ros_node.node.destroySubscription(this.subscription);
+            Ros2Instance.instance().node.destroySubscription(this.subscription);
             this.subscription = null;
             node.status({ fill: null, shape: null, text: ""});
         });

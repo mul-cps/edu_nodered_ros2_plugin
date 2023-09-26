@@ -1,4 +1,4 @@
-let { Ros2Instance } = require('../ros2/ros2-instance');
+const { Ros2Instance } = require('../ros2/ros2-instance');
 const { ActionClient } = require("rclnodejs");
 
 // RED argument provides the module access to Node-RED runtime api
