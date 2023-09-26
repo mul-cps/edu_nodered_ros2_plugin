@@ -1,5 +1,5 @@
 let { Ros2Instance } = require('../ros2/ros2-instance');
-const { rclnodejs, ActionClient } = require("rclnodejs");
+const { ActionClient } = require("rclnodejs");
 
 // RED argument provides the module access to Node-RED runtime api
 module.exports = function(RED)
@@ -87,7 +87,7 @@ module.exports = function(RED)
             const goal_handle_promise = node.action_client.sendGoal(goal_request, function(feedback) {
                 // Passes the message to the next node in the flow
                 node.status({ fill: "green", shape: "dot", text: "action is processing"});
-                node.send({ }, { payload: feedback });
+                node.send([ null, { payload: feedback } ]);
             });
         
             node.status({ fill: "green", shape: "dot", text: "goal request published"});
@@ -108,7 +108,7 @@ module.exports = function(RED)
             }
 
             node.status({ fill: "green", shape: "dot", text: "result received"});
-            node.send({ payload: result }, { });
+            node.send([{ payload: result }, null ]);
         }
         catch (error) {
             console.log("sending goal request failed. error:");
