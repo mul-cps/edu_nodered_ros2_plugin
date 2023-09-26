@@ -2,9 +2,101 @@
 
 [![License: MIT](https://img.shields.io/github/license/ramp-eu/TTE.project1.svg)](https://opensource.org/licenses/MIT)
 
-This project is part of [DIH^2](http://www.dih-squared.eu/). The main goal is provide [Node-RED](https://nodered.org/docs/) interoperability with
-[ROS2](https://docs.ros.org/) and [FIWARE](https://fiware-orion.readthedocs.io/en/master/). The plugin introduces in the
-Node-RED palette new nodes dealing with:
+This project is started as an fork of [node-red-ros2-plugin](https://github.com/eProsima/node-red-ros2-plugin) from eProsima. We removed the [Integration Service](https://integration-service.docs.eprosima.com/en/latest/) and added ROS service client and ROS action client using the Java Script ROS API, [rclnodejs](https://github.com/RobotWebTools/rclnodejs).
+
+## Installation
+
+### Checking if Node-Red is already Installed
+
+It could happen that the compose up command fails duo to the port 1880 is already in use. The application that caused this error can be determined by following command: 
+
+```bash
+sudo netstat -tulpn
+```
+This command will print out a table with all used ports at moment. The 3. column shows on which ip and port an application is listening:
+
+```bash
+tcp   0   0 0.0.0.0:1880    0.0.0.0:*    LISTEN   27803/node-red 
+```
+
+In this case another node red installation is already using the port. If this instance is installed on debian based  system it can be uninstalled by:
+
+```bash
+sudo apt remove node-red 
+```
+
+### Checking on a EduArt's Robot
+
+If Node-Red should be installed on a EduArt's Robot than you have to connect to the robot first using command ssh. For this the robot's IP address is required. For installing or updating the Node-Red software a internet connection is required, this means usually the robot is connected by an ethernet connection to your local network. What leads in a IP address assigned by the DHCP server of your network. Either get the IP address from the router (usually by using its web interface) or use the tool nmap:
+
+```bash
+sudo nmap -sn <your local subnet, for example: 192.168.1.0/24>
+```
+
+A list of all devices connected to your local subnet is shown. Pick the robot's IP. We assume the robot's IP is 192.168.0.100 from this point on. Connect to the robot using:
+
+```bash
+ssh root@192.168.0.100
+```
+
+Now use the instruction from section before.
+
+
+### Installing EduArt's Node-Red ROS2 Plugin
+
+The plugin comes with a Node-Red installation deployed in a Docker image. This makes it easy to install and use. First get the open source code by cloning the repository on your target machine, most likely on a robot:
+
+```bash
+git clone https://github.com/EduArt-Robotik/edu_nodered_ros2_plugin.git 
+```
+
+Go inside the docker folder where the compose file is located:
+
+```bash
+cd edu_nodered_ros2_plugin/docker/ 
+```
+
+Then execute the command:
+
+```bash
+docker compose up
+```
+
+The Node-Red web server will start up. The docker container will be autostart after a reboot or if an error occurred.
+
+
+### Updating EduArt's Node-Red ROS2 Plugin
+
+#### Checking
+
+To be always up to date, it is worth checking the system regularly for updates. To do this, change to the "home" directory and then into the folder "edu_nodered_ros2_plugin" and execute the commands:
+
+```bash
+git checkout master
+git pull origin
+```
+
+The output will tell you if there is a new version of the code.
+
+#### Update
+
+Don't worry previously performed work in Node-Red will be preserved as the data is stored outside the Docker container. First remove current version. Go into the folder where the docker compose file is located: 
+
+```bash
+cd edu_nodered_ros2_plugin/docker/ 
+```
+
+Now the new version can be started by the command: 
+
+```bash
+docker compose up
+```
+
+The container will be stopped and the new pulled and started.
+
+
+
+
 
 ### Type definition
 
