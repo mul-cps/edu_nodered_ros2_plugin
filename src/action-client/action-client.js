@@ -1,4 +1,4 @@
-const ros_node = require('../ros2/ros2-instance');
+let { Ros2Instance } = require('../ros2/ros2-instance');
 const { rclnodejs, ActionClient } = require("rclnodejs");
 
 // RED argument provides the module access to Node-RED runtime api
@@ -31,7 +31,7 @@ module.exports = function(RED)
             console.log("type:")
             console.log(config['selectedtype']);
 
-            this.action_client = new ActionClient(ros_node.node, config['selectedtype'], config['topic']);
+            this.action_client = new ActionClient(Ros2Instance.instance().node, config['selectedtype'], config['topic']);
 
             node.ready = true;
             node.status({ fill: "yellow", shape: "dot", text: "created"});
@@ -60,7 +60,9 @@ module.exports = function(RED)
                     return;
                 }
 
-                performing_action(node, msg.payload);
+                console.log("starting of performing action");
+                node.future_action_result = performing_action(node, msg.payload);
+                console.log("started async function");
             }
             else {
                done("node was not ready to process flow data");
@@ -78,18 +80,19 @@ module.exports = function(RED)
     // performing action
     async function performing_action(node, goal_request)
     {
-        console.log("goal_request:");
+        console.log("try to send goal_request:");
         console.log(goal_request);
         try {
             // service is available and ready
-            const goal_handle = await node.action_client.sendGoal(goal_request, function(feedback) {
+            const goal_handle_promise = node.action_client.sendGoal(goal_request, function(feedback) {
                 // Passes the message to the next node in the flow
                 node.status({ fill: "green", shape: "dot", text: "action is processing"});
                 node.send({ }, { payload: feedback });
             });
         
             node.status({ fill: "green", shape: "dot", text: "goal request published"});
-            
+            const goal_handle = await goal_handle_promise;
+
             if (goal_handle.isAccepted() == false) {
                 node.status({ fill: "red", shape: "dot", text: "gaol request rejected"});
                 return;
