@@ -1,8 +1,7 @@
 services:
     eduart-node-red:
-        user: root
-        # image: eduartrobotik/eduart-nodered:0.2.1
-        image: eduart-nodered:0.2.1
+        user: user
+        image: eduartrobotik/eduart-nodered:0.2.1
         network_mode: host
         command: node-red --userDir /data
         restart: always
@@ -10,7 +9,7 @@ services:
         ipc: host
         pid: host
         volumes:
-            - node_red_user_data:/data
+            - node_red_user_data:/data:rw
 
 volumes:
     node_red_user_data:
