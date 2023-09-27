@@ -214,7 +214,7 @@ namespaces to simplify identification, as in `/eduard/red/status_report`.
 
 ##### Example
 
-This example show how to subscribe to an topic and display it using the **debug** node. It is based on the available topics of an EduArt's robot like Eduard.
+This example shows how to subscribe to an topic and display it using the **debug** node. It is based on the available topics of an EduArt's robot like Eduard.
 
 ![Subscription Example](docs/ros-subscription.gif)
 
@@ -240,10 +240,70 @@ This example show how to subscribe to an topic and display it using the **debug*
     </tr>
 </table>
 
-#### ROS2 Service Client
+##### Example
 
-#### ROS2 Action Client
+This example shows how to publish to an topic and display the published message using the **debug** node. It is based on the available topics of an EduArt's robot like Eduard.
 
+![Publisher Example](docs/ros-publishing.gif)
+
+### ROS2 Service Client
+
+In order to call or request an ROS service we need first to specify the associated type. The service type is represented by the node **ROS2 Service Type**. It is required that the **ROS2 Service Type** is connected to the **Service Client** node.
+
+<table>
+    <tr>
+        <td width="250"><img name="ROS2 Publisher" src="./docs/service-client.png" height="auto"></td>
+        <td>This node represents a ROS2 service client. It is able to call a specific service with specific QoS. The connected injection injects the service request only. After a successful service call the service response is output.</td>
+    </tr>
+    <tr>
+        <td><img name="ROS2 Publisher Dialog" src="./docs/publisher-edit-dialog.png" height="auto"/></td>
+        <td>The dialog provides controls to configure:
+            <dl>
+                <dt>Service</dt><dd>Note that the backslash <tt>/</tt> typical of ROS2 services is not necessary</dd>
+                <dt>Domain ID</dt><dd>Selected globally via the configuration node explained
+                <a href="#ros2-configuration-node">above</a></dd>
+                <dt>QoS</dt><dd>The <tt>+add</tt> button at the bottom adds new combo-boxes to the control where the
+                available options for each policy can be selected</dd>
+            </dl>
+        </td>
+    </tr>
+</table>
+
+#### Example
+
+This example shows how to call a service and displays the response using a **debug** node. It is based on the available topics of an EduArt's robot like Eduard. In this example the robot is switched in mode **autonomous drive**.
+
+![Service Client Example](docs/ros-service-client.gif)
+
+
+### ROS2 Action Client
+
+In order to perform a ROS action we need first to specify the associated type. The action type is represented by the node **ROS2 Action Type**. It is required that the **ROS2 Action Type** is connected to the **Action Client** node.
+
+<table>
+    <tr>
+        <td width="250"><img name="ROS2 Action Client" src="./docs/action-client.png" height="auto"></td>
+        <td>This node represents a ROS2 action client. It is able to perform a specific action with specific QoS. The connected injection injects the action goal request only. After a accepted action goal the action feedback and the final result is outputted.</td>
+    </tr>
+    <tr>
+        <td><img name="ROS2 Action Client Dialog" src="./docs/action-client-edit-dialog.png" height="auto"/></td>
+        <td>The dialog provides controls to configure:
+            <dl>
+                <dt>Action</dt><dd>Note that the backslash <tt>/</tt> typical of ROS2 topics is not necessary</dd>
+                <dt>Domain ID</dt><dd>Selected globally via the configuration node explained
+                <a href="#ros2-configuration-node">above</a></dd>
+                <dt>QoS</dt><dd>The <tt>+add</tt> button at the bottom adds new combo-boxes to the control where the
+                available options for each policy can be selected</dd>
+            </dl>
+        </td>
+    </tr>
+</table>
+
+#### Example
+
+This example shows how to perform a action and displays the feedback and result using two **debug** nodes. It is based on the ROS action tutorial [turtle sim](https://docs.ros.org/en/foxy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Actions/Understanding-ROS2-Actions.html#ros2-action-send-goal). If you want to reproduce it the turtle sim node has to be launched like in the tutorial.
+
+![Action Client Example](docs/ros-action-turtle-sim.gif)
 
 ### ROS2 Examples
 
