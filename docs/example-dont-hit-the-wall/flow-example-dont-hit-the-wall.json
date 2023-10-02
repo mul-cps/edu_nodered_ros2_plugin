@@ -1,0 +1,334 @@
+[
+    {
+        "id": "536c39624d61f6e3",
+        "type": "tab",
+        "label": "Flow: dont hit the wall",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "55341473587df6fd",
+        "type": "Service Client",
+        "z": "536c39624d61f6e3",
+        "topic": "/eduard/red/set_mode",
+        "domain": "c9505fb5187f49ac",
+        "props": [],
+        "selectedtype": "edu_robot/srv/SetMode",
+        "x": 760,
+        "y": 400,
+        "wires": [
+            [
+                "cf070ff1580ea11b"
+            ]
+        ]
+    },
+    {
+        "id": "e9d9dcfbaca6768f",
+        "type": "ROS2 Service Type",
+        "z": "536c39624d61f6e3",
+        "ros2pkg": "edu_robot",
+        "ros2service": "SetMode",
+        "x": 510,
+        "y": 400,
+        "wires": [
+            [
+                "55341473587df6fd"
+            ]
+        ]
+    },
+    {
+        "id": "b81d385199210f80",
+        "type": "ROS2 Inject",
+        "z": "536c39624d61f6e3",
+        "types": [],
+        "props": [
+            {
+                "p": "mode.mode",
+                "v": "4",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "mode.drive_kinematic",
+                "v": "",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "mode.feature_mode",
+                "v": "",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "disable_feature",
+                "v": "",
+                "vt": "num",
+                "t": "uint8"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "edu_robot/srv/SetMode",
+        "idltype": "",
+        "x": 290,
+        "y": 400,
+        "wires": [
+            [
+                "e9d9dcfbaca6768f"
+            ]
+        ]
+    },
+    {
+        "id": "cf070ff1580ea11b",
+        "type": "debug",
+        "z": "536c39624d61f6e3",
+        "name": "set mode response",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "77aa3f0f416140ab",
+        "type": "ROS2 Type",
+        "z": "536c39624d61f6e3",
+        "ros2pkg": "sensor_msgs",
+        "ros2message": "Range",
+        "x": 300,
+        "y": 520,
+        "wires": [
+            [
+                "734cfa21f77e319f"
+            ]
+        ]
+    },
+    {
+        "id": "734cfa21f77e319f",
+        "type": "Subscriber",
+        "z": "536c39624d61f6e3",
+        "topic": "/eduard/red/range/front/left/range",
+        "domain": "c9505fb5187f49ac",
+        "props": [],
+        "selectedtype": "sensor_msgs/msg/Range",
+        "x": 530,
+        "y": 520,
+        "wires": [
+            [
+                "898e27b0510c3a5f",
+                "b7ba788ef29ce80d"
+            ]
+        ]
+    },
+    {
+        "id": "c18f0a29585853ee",
+        "type": "ROS2 Type",
+        "z": "536c39624d61f6e3",
+        "ros2pkg": "geometry_msgs",
+        "ros2message": "Twist",
+        "x": 520,
+        "y": 640,
+        "wires": [
+            [
+                "898e27b0510c3a5f"
+            ]
+        ]
+    },
+    {
+        "id": "695bf163e7584891",
+        "type": "ROS2 Inject",
+        "z": "536c39624d61f6e3",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "0.1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 290,
+        "y": 640,
+        "wires": [
+            [
+                "c18f0a29585853ee"
+            ]
+        ]
+    },
+    {
+        "id": "898e27b0510c3a5f",
+        "type": "function",
+        "z": "536c39624d61f6e3",
+        "name": "function: reduce velocity",
+        "func": "// storing input values\nif (msg.payload[\"range\"] != undefined) { \n    context.set(\"range\", msg.payload[\"range\"]); \n} \nelse if (msg.payload[\"linear\"] != undefined) { \n    context.set(\"twist\", msg.payload); \n} \n\n// checking if distance is to close\nif (context.get(\"range\") < 0.2) {\n    // override received twist command\n    let twist = context.get(\"twist\"); \n\n    twist.linear.x = 0.0; \n    twist.linear.y = 0.0; \n    twist.angular.z = 0.0; \n\n    context.set(\"twist\", twist); \n}\n\n// publish twist command\nmsg = { payload: context.get(\"twist\") }; \n\nreturn msg; ",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 640,
+        "wires": [
+            [
+                "7cc03fc1c53560aa"
+            ]
+        ]
+    },
+    {
+        "id": "e1556a5f6312460e",
+        "type": "comment",
+        "z": "536c39624d61f6e3",
+        "name": "sending continuously twist msg",
+        "info": "",
+        "x": 290,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "3083733137a1cc65",
+        "type": "comment",
+        "z": "536c39624d61f6e3",
+        "name": "receiving range msg",
+        "info": "",
+        "x": 250,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "0d2caf65084e8654",
+        "type": "comment",
+        "z": "536c39624d61f6e3",
+        "name": "stop robot if distance to close",
+        "info": "",
+        "x": 840,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "f7d7c06dc40c25f7",
+        "type": "comment",
+        "z": "536c39624d61f6e3",
+        "name": "set robot's mode",
+        "info": "",
+        "x": 240,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "b7ba788ef29ce80d",
+        "type": "debug",
+        "z": "536c39624d61f6e3",
+        "name": "range measurement",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "48549fe41bce8e09",
+        "type": "debug",
+        "z": "536c39624d61f6e3",
+        "name": "cmd_vel command",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1370,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "7cc03fc1c53560aa",
+        "type": "ROS2 Type",
+        "z": "536c39624d61f6e3",
+        "ros2pkg": "geometry_msgs",
+        "ros2message": "Twist",
+        "x": 1120,
+        "y": 640,
+        "wires": [
+            [
+                "1c0ad8c311c4ea67",
+                "48549fe41bce8e09"
+            ]
+        ]
+    },
+    {
+        "id": "1c0ad8c311c4ea67",
+        "type": "Publisher",
+        "z": "536c39624d61f6e3",
+        "topic": "/eduard/red/autonomous/cmd_vel",
+        "domain": "c9505fb5187f49ac",
+        "props": [],
+        "selectedtype": "geometry_msgs/msg/Twist",
+        "x": 1360,
+        "y": 640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c9505fb5187f49ac",
+        "type": "dds-settings",
+        "domain": "0"
+    }
+]

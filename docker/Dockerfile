@@ -58,7 +58,7 @@ RUN apt-get update \
     && curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.bash && \
     chmod +x nodesource_setup.bash && \
     bash -c ./nodesource_setup.bash && \
-    apt-get install -y nodejs
+    apt-get install -y nodejs ros-humble-turtlesim
 
 # Install Node-RED and node-red-ros2-plugin
 RUN source /opt/ros/$ROS_DISTRO/setup.bash \
@@ -80,6 +80,10 @@ RUN echo "installing ROS2 plugin" \
     # && export NVM_DIR="$HOME/.nvm" \
     # && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" \
     && npm install -g ./edu_nodered_ros2_plugin
+
+RUN echo "creating storage for flow data" \
+    && mkdir -p /data \
+    && chmod a+w /data
 
 # Enable overlay execution
 WORKDIR /

@@ -6,13 +6,13 @@ module.exports = function(RED)
     var interface_list = [];
 
     /*
-     * @function ROS2Types constructor
-     * This node is defined by the constructor function ROS2Types,
+     * @function ROS2ActionTypes constructor
+     * This node is defined by the constructor function ROS2ActionTypes,
      * which is called when a new instance of the node is created
      *
      * @param {Object} config - Contains the properties set in the flow editor
      */
-    function ROS2Types(config)
+    function ROS2ActionTypes(config)
     {
         // Initiliaze the features shared by all nodes
         RED.nodes.createNode(this, config);
@@ -37,37 +37,36 @@ module.exports = function(RED)
     }
 
     // The node is registered in the runtime using the name publisher
-    RED.nodes.registerType("ROS2 Type", ROS2Types);
+    RED.nodes.registerType("ROS2 Action Type", ROS2ActionTypes);
 
     // Function that pass the IS ROS 2 compiled packages to the html file
-    RED.httpAdmin.get("/ros2msgspackages", RED.auth.needsPermission('ROS2 Type.read'), function(req,res)
+    RED.httpAdmin.get("/ros2actionpackages", RED.auth.needsPermission('ROS2 Action Type.read'), function(req,res)
     {
         if (package_list.length > 0) {
             // Uses previous estimated message package list.
-            console.log("uses previous estimated message package list:");
+            console.log("uses previous estimated action package list:");
             console.log(package_list);
             res.json(package_list);
             return;
         }
 
-        console.log("Estimate all packages that provide messages.");
+        console.log("Estimate all packages that provide actions.");
         execFile("ros2", ["interface", "list"], function(error, stdout, stderr) {    
-            var found_message_start = false;
-            // var package_list = [];
+            var found_service_start = false;
             
             stdout.split('\n').forEach(line => {
-                if (found_message_start == false && line.includes("Messages:")) {
+                if (found_service_start == false && line.includes("Actions:")) {
                     // found start of services --> processing list at next iteration
-                    found_message_start = true;
+                    found_service_start = true;
                     return;
                 }
-                if (found_message_start == false) {
-                    // no services --> no processing
+                if (found_service_start == false) {
+                    // no action --> no processing
                     return;
                 }
-                if (found_message_start == true && line.includes("Services:")) {
+                if (found_service_start == true && line.includes("/") == false) {
                     // end of services reached --> stop processing
-                    found_message_start = false;
+                    found_service_start = false;
                     return;
                 }
 
@@ -79,30 +78,30 @@ module.exports = function(RED)
                 }
             });
 
-            console.log("Found following packages that provide messages:");
+            console.log("Found following packages that provide actions:");
             console.log(package_list);
             res.json(package_list);
         });
     });
 
-    // Function that pass the IS ROS 2 package compiled msgs to the html file
-    RED.httpAdmin.get("/ros2msgs", RED.auth.needsPermission('ROS2 Type.read'), function(req,res)
+    // Function that pass the IS ROS 2 package compiled actions to the html file
+    RED.httpAdmin.get("/ros2actions", RED.auth.needsPermission('ROS2 Action Type.read'), function(req,res)
     {
         if (interface_list[req.query["package"]] != undefined) {
             // Uses previous estimated message list.
-            console.log("uses already estimated message list:");
+            console.log("uses already estimated action list:");
             console.log(interface_list[req.query["package"]]);
             res.json(interface_list[req.query["package"]]);
             return;
         }
 
-        console.log("Estimate all messages that is provided by package '" + req.query["package"] + "':");
+        console.log("Estimate all actions that is provided by package '" + req.query["package"] + "':");
         execFile("ros2", ["interface", "list"], function(error, stdout, stderr) {    
             var found_service_start = false;
-            var message_list = [];
+            var action_list = [];
             
             stdout.split('\n').forEach(line => {
-                if (found_service_start == false && line.includes("Messages:")) {
+                if (found_service_start == false && line.includes("Actions:")) {
                     // found start of services --> processing list at next iteration
                     found_service_start = true;
                     return;
@@ -111,24 +110,19 @@ module.exports = function(RED)
                     // no services --> no processing
                     return;
                 }
-                if (found_service_start == true && line.includes("Services:")) {
-                    // end of services reached --> stop processing
-                    found_service_start = false;
-                    return;
-                }
 
                 line = line.trim();
                 line_parts = line.split('/');
 
                 if (line_parts[0] == req.query['package']) {
-                    message_list.push(line_parts[2]);
+                    action_list.push(line_parts[2]);
                 }
             });
 
-            console.log("Found following services that is provided by package '" + req.query["package"] + "':");
-            console.log(message_list);
-            interface_list[req.query["package"]] = message_list;
-            res.json(message_list);
+            console.log("Found following actions that is provided by package '" + req.query["package"] + "':");
+            console.log(action_list);
+            interface_list[req.query["package"]] = action_list;            
+            res.json(action_list);
         });
     });
 }

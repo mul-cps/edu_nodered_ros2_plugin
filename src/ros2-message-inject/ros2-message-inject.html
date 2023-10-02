@@ -152,17 +152,13 @@
 
     var custom_struct = {};
 
-    function processIDL(idl_str, pkg, msg, srv, node, n) {
+    function processIDL(idl_str, pkg, msg, srv, action, node, n) {
         console.log("processIDL");
-        console.log(idl_str);
-        console.log(pkg);
-        console.log(msg);
-        console.log(srv);
-        console.log(node);
-        console.log(n);
+
         var params = {};
         var type_name = "";
         var complete_name = "";
+        params['old_props'] = node.old_props;
 
         if (idl_str) {
             params['idl'] = idl_str;
@@ -185,6 +181,14 @@
             console.log("complete_name");
             console.log(complete_name);            
         }
+        else if (action) {
+            params['package'] = pkg;
+            params['action'] = action;
+            type_name = n.target.ros2action;
+            complete_name = n.target.ros2pkg + "::action::" + n.target.ros2action;
+            console.log("complete_name");
+            console.log(complete_name);            
+        }        
         else {
             console.log("No target given. --> Cancel processing of IDL.");
             return;
@@ -194,13 +198,28 @@
             console.log("get interfaces");
             console.log("received type list:");
             console.log(type_list);
-            console.log("length type list = " + type_list.length);
+
             type_list.forEach( function(type) {
-                let m = { p: type['name'], v: "", vt: type_map[type['type']], t: type['type'] };
+                let m = { p: type['name'], v: "", vt: type['type'].includes("[") ? "json" : type_map[type['type']], t: type['type'] };
                 console.log("add entry:");
                 console.log(m);
                 node.props.push(m);
             });
+
+            // Copy previous value if prop already got an value assigned.
+            console.log("old props:");
+            console.log(params['old_props']);
+
+            for (old_prop of params['old_props']) {
+                for (new_prop of node.props) {
+                    if (old_prop.p == new_prop.p) {
+                        new_prop.v = old_prop.v;
+                    }
+                }
+            }
+
+            console.log("new props:");
+            console.log(node.props);
             node.props.forEach(p => $("#node-input-property-container").editableList('addItem', p));
         });
     }
@@ -282,14 +301,13 @@
                                     new_mem = old_value + ',';
                                 }
                                 var json = {};
-                                custom_struct[n].forEach( function(mem)
-                                {
+                                custom_struct[n].forEach( function(mem) {
                                     var index = mem.p.indexOf('.');
                                     var previous_idx = 0;
                                     var level = json;
                                     var level_name = mem.p;
-                                    while (index != -1)
-                                    {
+
+                                    while (index != -1) {
                                         level_name = mem.p.substr(previous_idx, index - previous_idx);
                                         if (!Object.keys(level).includes(level_name)){
                                             level[level_name] = {};
@@ -298,13 +316,11 @@
                                         previous_idx = index + 1;
                                         index = mem.p.indexOf('.', previous_idx);
 
-                                        if (index == -1)
-                                        {
+                                        if (index == -1) {
                                             level_name = mem.p.substr(previous_idx);
                                         }
                                     }
-                                    switch(mem.vt)
-                                    {
+                                    switch(mem.vt) {
                                         case 'str':
                                             level[level_name] = ""; break;
                                         case 'num':
@@ -354,6 +370,7 @@
                 sortable: true
             });
 
+            node.old_props = [...node.props];
             node.props = [];
             custom_struct = [];
 
@@ -370,7 +387,7 @@
                             console.log(n.target.ros2message);
                             if (n.target.validationErrors.length > 0)
                             {
-                                RED.notify("The type must be configured before", "error");
+                                RED.notify("The message type must be configured before", "error");
                             }
                             else
                             {
@@ -378,13 +395,14 @@
                                 {
                                     node.idltype = "";
                                 }
-                                if (node.ros2type != n.target.ros2pkg + '/' + n.target.ros2message)
+                                if (node.ros2type != n.target.ros2pkg + '/msg/' + n.target.ros2message)
                                 {
-                                    node.ros2type = n.target.ros2pkg + '/' + n.target.ros2message;
+                                    node.ros2type = n.target.ros2pkg + '/msg/' + n.target.ros2message;
                                     node.props = [];
                                 }
 
-                                processIDL("", n.target.ros2pkg, n.target.ros2message, "", node, n);
+                                processIDL("", n.target.ros2pkg, n.target.ros2message, "", "", node, n);
+                                node.old_props = [];
                             }
                             break;
                         case "ROS2 Service Type":
@@ -392,7 +410,7 @@
                             console.log(n.target.ros2service);
                             if (n.target.validationErrors.length > 0)
                             {
-                                RED.notify("The type must be configured before", "error");
+                                RED.notify("The service type must be configured before", "error");
                             }
                             else
                             {
@@ -400,33 +418,37 @@
                                 {
                                     node.idltype = "";
                                 }
-                                if (node.ros2type != n.target.ros2pkg + '/' + n.target.ros2service)
+                                if (node.ros2type != n.target.ros2pkg + '/srv/' + n.target.ros2service)
                                 {
-                                    node.ros2type = n.target.ros2pkg + '/' + n.target.ros2service;
+                                    node.ros2type = n.target.ros2pkg + '/srv/' + n.target.ros2service;
                                     node.props = [];
                                 }
 
-                                processIDL("", n.target.ros2pkg, "", n.target.ros2service, node, n);
+                                processIDL("", n.target.ros2pkg, "", n.target.ros2service, "", node, n);
+                                node.old_props = [];
                             }
                             break;                            
-                        case "IDL Type":
+                        case "ROS2 Action Type":
+                            console.log(n.target.ros2pkg);
+                            console.log(n.target.ros2service);
                             if (n.target.validationErrors.length > 0)
                             {
-                                RED.notify("The type must be configured before", "error");
+                                RED.notify("The action type must be configured before", "error");
                             }
                             else
                             {
-                                if (node.ros2type != "")
+                                if (node.idltype != "")
                                 {
-                                    node.ros2type = "";
+                                    node.idltype = "";
                                 }
-                                if (node.idltype != n.target.name)
+                                if (node.ros2type != n.target.ros2pkg + '/action/' + n.target.ros2action)
                                 {
-                                    node.idltype = n.target.name;
+                                    node.ros2type = n.target.ros2pkg + '/action/' + n.target.ros2action;
                                     node.props = [];
                                 }
 
-                                processIDL(n.target.idltype, "", "", "", node, n);
+                                processIDL("", n.target.ros2pkg, "", "", n.target.ros2action, node, n);
+                                node.old_props = [];
                             }
                             break;
                     }

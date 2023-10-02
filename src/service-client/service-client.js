@@ -1,5 +1,4 @@
-const ros_node = require('../ros2/ros2-instance');
-const rclnodejs = require("rclnodejs");
+const { Ros2Instance } = require('../ros2/ros2-instance');
 
 // RED argument provides the module access to Node-RED runtime api
 module.exports = function(RED)
@@ -31,7 +30,7 @@ module.exports = function(RED)
             console.log("type:")
             console.log(config['selectedtype']);
 
-            this.client = ros_node.node.createClient(config['selectedtype'], config['topic'])
+            this.client = Ros2Instance.instance().node.createClient(config['selectedtype'], config['topic'])
             node.ready = true;
             node.status({ fill: "yellow", shape: "dot", text: "created"});
             console.log("service client was created successfully");
@@ -75,7 +74,7 @@ module.exports = function(RED)
 
         // Called when there is a re-deploy or the program is closed
         node.on('close', function() {
-            ros_node.node.destroyClient(this.client);
+            Ros2Instance.instance().node.destroyClient(this.client);
             this.client = null;
             node.status({ fill: null, shape: null, text: ""});
         });

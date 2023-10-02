@@ -51,9 +51,9 @@ function get_qos_from_props (config)
 // RED argument provides the module access to Node-RED runtime api
 module.exports = function(RED)
 {
-    var fs = require('fs');
-    // var is_web_api = require('is-web-api').ros2;
-    var ros_node = require('../ros2/ros2-instance');  
+    const fs = require('fs');
+    const { Ros2Instance } = require('../ros2/ros2-instance'); 
+
     /*
      * @function PublisherNode constructor
      * This node is defined by the constructor function PublisherNode,
@@ -85,7 +85,7 @@ module.exports = function(RED)
             console.log("uses following QoS:")
             console.log(qos);
 
-            this.publisher = ros_node.node.createPublisher(config['selectedtype'], config['topic'], {qos});
+            this.publisher = Ros2Instance.instance().node.createPublisher(config['selectedtype'], config['topic'], {qos});
             node.ready = true;
             node.status({ fill: "yellow", shape: "dot", text: "created"});
             console.log("publisher was created successfully");            
@@ -119,7 +119,7 @@ module.exports = function(RED)
 
         // Called when there is a re-deploy or the program is closed
         node.on('close', function() {
-            ros_node.node.destroyPublisher(this.publisher);
+            Ros2Instance.instance().node.destroyPublisher(this.publisher);
             this.publish = null;
             node.status({ fill: null, shape: null, text: ""});
         });
