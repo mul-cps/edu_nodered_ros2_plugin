@@ -8,7 +8,7 @@ This project is started as an fork of [node-red-ros2-plugin](https://github.com/
 
 ### Checking if Node-Red is already Installed
 
-It could happen that the compose up command fails duo to the port 1880 is already in use. The application that caused this error can be determined by following command: 
+It may happen that the **compose-up** command fails because port 1880 is already in use. The application that caused this error can be determined with the following command:
 
 ```bash
 sudo netstat -tulpn
@@ -19,7 +19,7 @@ This command will print out a table with all used ports at moment. The 3. column
 tcp   0   0 0.0.0.0:1880    0.0.0.0:*    LISTEN   27803/node-red 
 ```
 
-In this case another node red installation is already using the port. If this instance is installed on debian based  system it can be uninstalled by:
+In this case, the port is already in use by another Node Red installation. If this instance is installed on a Debian-based system, it can be uninstalled by :
 
 ```bash
 sudo apt remove node-red 
