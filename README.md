@@ -307,3 +307,4 @@ This example shows how to perform a action and displays the feedback and result 
 
 ### ROS2 Examples
 
+[Don't hit the Wall](docs/example-dont-hit-the-wall/example-dont-hit-the-wall.md)
