@@ -1,7 +1,7 @@
-image_name = eduart-nodered:0.2.2
+image_name = eduart-nodered:0.2.3
 
 download-sources:
-	git clone --branch feature/implement_missing_features https://github.com/EduArt-Robotik/edu_nodered_ros2_plugin.git
+	git clone --branch 0.2.3 https://github.com/EduArt-Robotik/edu_nodered_ros2_plugin.git
 
 build-docker:
 	docker build -t $(image_name) .
