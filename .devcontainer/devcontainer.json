@@ -1,0 +1,37 @@
+{
+  "name": "eduart-ros",
+  // "build" : { "dockerfile": "Dockerfile" },
+  // "image": "eduard-robot-monitoring:0.2.0",
+  "image": "eduartrobotik/eduart-nodered:0.2.3",
+  "runArgs": [
+    "-it",
+    // "--gpus",
+    // "all",
+    "--device",
+    "/dev/dri",
+    "--net=host",
+    "--pid=host",
+    "--env=DISPLAY",
+    "--volume=/tmp/.X11-unix:/tmp/.X11-unix:rw",
+    "--privileged",
+    "-v", "/dev:/dev"
+  ],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  //  "mounts": [
+  //   "source=/home/knueppl/ros/francor,target=/home/ros,type=bind,consistency=cached",
+  //   // "source=/home/knueppl/Downloads,target=/home/developer/Downloads,type=bind,consistency=cached",
+  //  ],
+  "remoteUser": "user",
+  "extensions": [
+	"ms-vscode.cmake-tools",
+	"ms-python.python",
+	"llvm-vs-code-extensions.vscode-clangd",
+	"streetsidesoftware.code-spell-checker",
+	"streetsidesoftware.code-spell-checker-german",
+	"eamodio.gitlens",
+	"ms-vscode.makefile-tools",
+	"ms-vscode.cpptools"
+]
+}
