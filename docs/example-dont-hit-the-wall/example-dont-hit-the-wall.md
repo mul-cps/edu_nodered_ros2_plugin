@@ -1,8 +1,8 @@
-# Example: Don't hti the Wall
+# Example: Don't hit the Wall
 
 This example shows how a application using Node-Red could look like. It receives measurements from one of the distance sensors of the robot Eduard and reduces the sent velocity, which is also sent in this example, in case of a close distance.
 
-If you simply want to try it you can use [this file](flow-example-dont-hit-the-wall.json) and import it into Node-Red using the import function.
+If you simply want to try it you can use [this file](../../example/flow-example-dont-hit-the-wall.json) and import it into Node-Red using the import function.
 
 Below all parts of the Node-Red flow are described part by part. The following figure shows an overview of the finished network:
 ![Application Overview](overview-application.png)
