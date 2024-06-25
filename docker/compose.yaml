@@ -1,7 +1,7 @@
 services:
     eduart-node-red:
         user: root
-        image: eduartrobotik/eduart-nodered:0.2.4
+        image: eduartrobotik/eduart-nodered:0.2.5
         network_mode: host
         command: node-red --userDir /data
         restart: always
