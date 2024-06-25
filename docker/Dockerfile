@@ -1,5 +1,5 @@
 ARG ROS_DISTRO=humble
-FROM eduartrobotik/eduart-robot:0.3.1
+FROM eduartrobotik/eduart-robot:0.4.1
 
 # Avoid interactuation with installation of some package that needs the locale.
 USER root
