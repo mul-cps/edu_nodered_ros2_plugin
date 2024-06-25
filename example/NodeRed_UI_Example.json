@@ -1,0 +1,3620 @@
+[
+    {
+        "id": "14b674bf0d2b6c61",
+        "type": "tab",
+        "label": "UI Example",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f1dc4bd0f1e4c901",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "mode.mode",
+                "v": "4",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "mode.drive_kinematic",
+                "v": "",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "mode.feature_mode",
+                "v": "",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "disable_feature",
+                "v": "",
+                "vt": "num",
+                "t": "uint8"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "edu_robot/srv/SetMode",
+        "idltype": "",
+        "x": 210,
+        "y": 280,
+        "wires": [
+            [
+                "aa2a54692a0c2dc0"
+            ]
+        ]
+    },
+    {
+        "id": "10ad1c9c1f8f5b9e",
+        "type": "Service Client",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/set_mode",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "edu_robot/srv/SetMode",
+        "x": 660,
+        "y": 280,
+        "wires": [
+            [
+                "ec37824b25c4aa6f"
+            ]
+        ]
+    },
+    {
+        "id": "ec37824b25c4aa6f",
+        "type": "debug",
+        "z": "14b674bf0d2b6c61",
+        "name": "set mode response",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "aa2a54692a0c2dc0",
+        "type": "ROS2 Service Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "edu_robot",
+        "ros2service": "SetMode",
+        "x": 430,
+        "y": 280,
+        "wires": [
+            [
+                "10ad1c9c1f8f5b9e"
+            ]
+        ]
+    },
+    {
+        "id": "cc2a7fbf212a5e0d",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "sensor_msgs",
+        "ros2message": "Range",
+        "x": 220,
+        "y": 400,
+        "wires": [
+            [
+                "8a1dcae830e0cce8"
+            ]
+        ]
+    },
+    {
+        "id": "8a1dcae830e0cce8",
+        "type": "Subscriber",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/range/front/left/range",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "sensor_msgs/msg/Range",
+        "x": 450,
+        "y": 400,
+        "wires": [
+            [
+                "d91e49c840ca8c4d",
+                "a176a062a14f0216"
+            ]
+        ]
+    },
+    {
+        "id": "c6b2f7fea06b6c6a",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 190,
+        "y": 560,
+        "wires": [
+            [
+                "0a77bff6d8bc5c9f"
+            ]
+        ]
+    },
+    {
+        "id": "0a77bff6d8bc5c9f",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "geometry_msgs",
+        "ros2message": "Twist",
+        "x": 440,
+        "y": 560,
+        "wires": [
+            [
+                "a176a062a14f0216"
+            ]
+        ]
+    },
+    {
+        "id": "a176a062a14f0216",
+        "type": "function",
+        "z": "14b674bf0d2b6c61",
+        "name": "function: reduce velocity",
+        "func": "// storing input values\nif (msg.payload[\"range\"] != undefined) {\n    // if range is defined than input is a range measurement\n    context.set(\"range\", msg.payload[\"range\"]); \n} \nelse if (msg.payload[\"linear\"] != undefined) { \n    // if linear is defined than input is a twist message.\n    context.set(\"twist\", msg.payload); \n} \n\n// checking if distance is to close\nif (context.get(\"range\") < 0.2) {\n    // override received twist command\n    let twist = context.get(\"twist\"); \n\n    twist.linear.x = 0.0; \n    twist.linear.y = 0.0; \n    twist.angular.z = 0.0; \n\n    context.set(\"twist\", twist); \n}\n\n// publish twist command\nmsg = { payload: context.get(\"twist\") }; \n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 540,
+        "wires": [
+            [
+                "1007b6c0cf7cfa32"
+            ]
+        ]
+    },
+    {
+        "id": "1007b6c0cf7cfa32",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "geometry_msgs",
+        "ros2message": "Twist",
+        "x": 1060,
+        "y": 540,
+        "wires": [
+            [
+                "f6d1c2a5e7d2308c"
+            ]
+        ]
+    },
+    {
+        "id": "86b72a3f9ae9b7fa",
+        "type": "Publisher",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/autonomous/cmd_vel",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "geometry_msgs/msg/Twist",
+        "x": 1320,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d91e49c840ca8c4d",
+        "type": "debug",
+        "z": "14b674bf0d2b6c61",
+        "name": "range measurement",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "f6d1c2a5e7d2308c",
+        "type": "debug",
+        "z": "14b674bf0d2b6c61",
+        "name": "cmd_vel command",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1310,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "fc2a75d70f507d97",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "sensor_msgs",
+        "ros2message": "Range",
+        "x": 220,
+        "y": 3360,
+        "wires": [
+            [
+                "1329cda6ecb29374"
+            ]
+        ]
+    },
+    {
+        "id": "1329cda6ecb29374",
+        "type": "Subscriber",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/range/front/left/range",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "sensor_msgs/msg/Range",
+        "x": 450,
+        "y": 3360,
+        "wires": [
+            [
+                "4a447720a006cad0",
+                "261b6005052c59c3"
+            ]
+        ]
+    },
+    {
+        "id": "4a447720a006cad0",
+        "type": "debug",
+        "z": "14b674bf0d2b6c61",
+        "name": "range measurement",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 3400,
+        "wires": []
+    },
+    {
+        "id": "261b6005052c59c3",
+        "type": "ui_gauge",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "d39c279380872ec6",
+        "order": 1,
+        "width": 4,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Front Left",
+        "label": "m",
+        "format": "{{msg.payload.range}}",
+        "min": 0,
+        "max": "2",
+        "colors": [
+            "#ff000d",
+            "#e6e600",
+            "#60cb3a"
+        ],
+        "seg1": "0.3",
+        "seg2": "0.5",
+        "diff": false,
+        "className": "",
+        "x": 800,
+        "y": 3360,
+        "wires": []
+    },
+    {
+        "id": "9d618240972de9a6",
+        "type": "comment",
+        "z": "14b674bf0d2b6c61",
+        "name": "User Interface",
+        "info": "",
+        "x": 170,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "6b654c287b0f132a",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "sensor_msgs",
+        "ros2message": "Range",
+        "x": 220,
+        "y": 3500,
+        "wires": [
+            [
+                "3ad4cf26b53c3610"
+            ]
+        ]
+    },
+    {
+        "id": "3ad4cf26b53c3610",
+        "type": "Subscriber",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/range/front/right/range",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "sensor_msgs/msg/Range",
+        "x": 450,
+        "y": 3500,
+        "wires": [
+            [
+                "d5e0a80adc9bf85a",
+                "781656366191f032"
+            ]
+        ]
+    },
+    {
+        "id": "d5e0a80adc9bf85a",
+        "type": "debug",
+        "z": "14b674bf0d2b6c61",
+        "name": "range measurement",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 3540,
+        "wires": []
+    },
+    {
+        "id": "f18951c81f16cbbc",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "sensor_msgs",
+        "ros2message": "Range",
+        "x": 220,
+        "y": 3620,
+        "wires": [
+            [
+                "88ceb364794b2057"
+            ]
+        ]
+    },
+    {
+        "id": "88ceb364794b2057",
+        "type": "Subscriber",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/range/rear/left/range",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "sensor_msgs/msg/Range",
+        "x": 450,
+        "y": 3620,
+        "wires": [
+            [
+                "be8eefdb2b5d160d",
+                "4536bd4badf57c17"
+            ]
+        ]
+    },
+    {
+        "id": "be8eefdb2b5d160d",
+        "type": "debug",
+        "z": "14b674bf0d2b6c61",
+        "name": "range measurement",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 3660,
+        "wires": []
+    },
+    {
+        "id": "b8f7052a6e90e0a0",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "sensor_msgs",
+        "ros2message": "Range",
+        "x": 220,
+        "y": 3740,
+        "wires": [
+            [
+                "3a05f0d4ac555014"
+            ]
+        ]
+    },
+    {
+        "id": "3a05f0d4ac555014",
+        "type": "Subscriber",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/range/rear/right/range",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "sensor_msgs/msg/Range",
+        "x": 450,
+        "y": 3740,
+        "wires": [
+            [
+                "2a0349dd1c8e9eee",
+                "344cb90ccdabda82"
+            ]
+        ]
+    },
+    {
+        "id": "2a0349dd1c8e9eee",
+        "type": "debug",
+        "z": "14b674bf0d2b6c61",
+        "name": "range measurement",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 3780,
+        "wires": []
+    },
+    {
+        "id": "39c076f4da9da7d1",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "edu_robot",
+        "ros2message": "RobotStatusReport",
+        "x": 250,
+        "y": 3940,
+        "wires": [
+            [
+                "8751b2259804bb53"
+            ]
+        ]
+    },
+    {
+        "id": "8751b2259804bb53",
+        "type": "Subscriber",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/status_report",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "edu_robot/msg/RobotStatusReport",
+        "x": 530,
+        "y": 3940,
+        "wires": [
+            [
+                "d5c5e059bda41385",
+                "53d1dfefad83641d"
+            ]
+        ]
+    },
+    {
+        "id": "d5c5e059bda41385",
+        "type": "debug",
+        "z": "14b674bf0d2b6c61",
+        "name": "Robot Status",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 3940,
+        "wires": []
+    },
+    {
+        "id": "53d1dfefad83641d",
+        "type": "ui_gauge",
+        "z": "14b674bf0d2b6c61",
+        "name": "Voltage",
+        "group": "77fafff1fd7418ce",
+        "order": 1,
+        "width": 8,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Voltage",
+        "label": "V",
+        "format": "{{msg.payload.mcu_voltage}}",
+        "min": "15",
+        "max": "35",
+        "colors": [
+            "#b30000",
+            "#e6e600",
+            "#57d147"
+        ],
+        "seg1": "22",
+        "seg2": "25",
+        "diff": false,
+        "className": "",
+        "x": 800,
+        "y": 3980,
+        "wires": []
+    },
+    {
+        "id": "781656366191f032",
+        "type": "ui_gauge",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "d39c279380872ec6",
+        "order": 2,
+        "width": 4,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Front Right",
+        "label": "m",
+        "format": "{{msg.payload.range}}",
+        "min": 0,
+        "max": "2",
+        "colors": [
+            "#ff000d",
+            "#e6e600",
+            "#60cb3a"
+        ],
+        "seg1": "0.3",
+        "seg2": "0.5",
+        "diff": false,
+        "className": "",
+        "x": 810,
+        "y": 3500,
+        "wires": []
+    },
+    {
+        "id": "4536bd4badf57c17",
+        "type": "ui_gauge",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "d39c279380872ec6",
+        "order": 3,
+        "width": 4,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Rear Left",
+        "label": "m",
+        "format": "{{msg.payload.range}}",
+        "min": 0,
+        "max": "2",
+        "colors": [
+            "#ff000d",
+            "#e6e600",
+            "#60cb3a"
+        ],
+        "seg1": "0.3",
+        "seg2": "0.5",
+        "diff": false,
+        "className": "",
+        "x": 800,
+        "y": 3620,
+        "wires": []
+    },
+    {
+        "id": "344cb90ccdabda82",
+        "type": "ui_gauge",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "d39c279380872ec6",
+        "order": 4,
+        "width": 4,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Rear Right",
+        "label": "m",
+        "format": "{{msg.payload.range}}",
+        "min": 0,
+        "max": "2",
+        "colors": [
+            "#ff000d",
+            "#e6e600",
+            "#60cb3a"
+        ],
+        "seg1": "0.3",
+        "seg2": "0.5",
+        "diff": false,
+        "className": "",
+        "x": 810,
+        "y": 3740,
+        "wires": []
+    },
+    {
+        "id": "5833a8e30ed782b5",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "edu_robot",
+        "ros2message": "RobotStatusReport",
+        "x": 250,
+        "y": 4080,
+        "wires": [
+            [
+                "6d3b7941fe0fae5b"
+            ]
+        ]
+    },
+    {
+        "id": "6d3b7941fe0fae5b",
+        "type": "Subscriber",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/status_report",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "edu_robot/msg/RobotStatusReport",
+        "x": 530,
+        "y": 4080,
+        "wires": [
+            [
+                "dc84b70328548f39",
+                "9e1804d23fb2f470"
+            ]
+        ]
+    },
+    {
+        "id": "dc84b70328548f39",
+        "type": "debug",
+        "z": "14b674bf0d2b6c61",
+        "name": "Robot Status",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 4080,
+        "wires": []
+    },
+    {
+        "id": "9e1804d23fb2f470",
+        "type": "ui_gauge",
+        "z": "14b674bf0d2b6c61",
+        "name": "Current",
+        "group": "77fafff1fd7418ce",
+        "order": 2,
+        "width": 8,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Current",
+        "label": "A",
+        "format": "{{msg.payload.mcu_current}}",
+        "min": "0",
+        "max": "3",
+        "colors": [
+            "#50b300",
+            "#e6e600",
+            "#cb3a3a"
+        ],
+        "seg1": "1",
+        "seg2": "2",
+        "diff": false,
+        "className": "",
+        "x": 800,
+        "y": 4120,
+        "wires": []
+    },
+    {
+        "id": "14246afea52ab3f5",
+        "type": "Publisher",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/set_lighting_color",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "edu_robot/msg/SetLightingColor",
+        "x": 840,
+        "y": 2560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "382b5be838d0399f",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "lighting_name",
+                "v": "left_side",
+                "vt": "str",
+                "t": "string"
+            },
+            {
+                "p": "r",
+                "v": "0",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "g",
+                "v": "255",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "b",
+                "v": "0",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "brightness.data",
+                "v": "100",
+                "vt": "num",
+                "t": "float32"
+            },
+            {
+                "p": "mode",
+                "v": "2",
+                "vt": "num",
+                "t": "uint8"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "edu_robot/msg/SetLightingColor",
+        "idltype": "",
+        "x": 370,
+        "y": 2560,
+        "wires": [
+            [
+                "6aa53d8b76c825d3"
+            ]
+        ]
+    },
+    {
+        "id": "6aa53d8b76c825d3",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "edu_robot",
+        "ros2message": "SetLightingColor",
+        "x": 600,
+        "y": 2560,
+        "wires": [
+            [
+                "14246afea52ab3f5"
+            ]
+        ]
+    },
+    {
+        "id": "1cfa60ef17839cc0",
+        "type": "comment",
+        "z": "14b674bf0d2b6c61",
+        "name": "Lights",
+        "info": "**Mode and capabilities**\n0 = off\n1 = dim\n2 = flash --> left side and right side single control\n3 = pulsation\n4 = rotation\n5 = running\n\n**Groups**\nleft_side\nright_side\nall",
+        "x": 170,
+        "y": 2500,
+        "wires": []
+    },
+    {
+        "id": "3beb49297693cdf0",
+        "type": "ui_button",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "4096a1cadf804d6e",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Start Example",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "twitter",
+        "payload": "asdf",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 120,
+        "y": 200,
+        "wires": [
+            [
+                "f1dc4bd0f1e4c901",
+                "c6b2f7fea06b6c6a"
+            ]
+        ]
+    },
+    {
+        "id": "fa768575280ba8c9",
+        "type": "switch",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 1100,
+        "wires": [
+            [
+                "aef888b49e1e75fb",
+                "6868fb8dc7eb01b5"
+            ],
+            [
+                "81657a6c5a7257ac"
+            ]
+        ]
+    },
+    {
+        "id": "4a193389.e055ac",
+        "type": "ui_template",
+        "z": "14b674bf0d2b6c61",
+        "group": "262d6637dcc34f10",
+        "name": "Drive Forward",
+        "order": 4,
+        "width": 2,
+        "height": 2,
+        "format": "<style>\n    .nr-dashboard-template {\n        padding: 0px;\n        }\n    }\n</style>\n<div class=\"momentary_forward\">\n    <md-button style=\"width:100%; height:48px; margin: 0px\">\n        <i class=\"material-icons\">arrow_upward</i>\n</div>\n\n<script>\n    (function($scope) {\n    let interval;\n\n    function startSending() {\n        // Send immediately\n        $scope.send({\"payload\": true});\n        // Start interval to send every 20ms\n        interval = setInterval(function() {\n            $scope.send({\"payload\": true});\n        }, 20);\n    }\n\n    function stopSending() {\n        clearInterval(interval);\n        $scope.send({\"payload\": false});\n    }\n\n    $('.momentary_forward').on('touchstart mousedown', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        startSending();\n    });\n\n    $('.momentary_forward').on('touchend mouseup mouseleave', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        stopSending();\n    });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 200,
+        "y": 1100,
+        "wires": [
+            [
+                "fa768575280ba8c9"
+            ]
+        ]
+    },
+    {
+        "id": "6868fb8dc7eb01b5",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "mode.mode",
+                "v": "4",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "mode.drive_kinematic",
+                "v": "",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "mode.feature_mode",
+                "v": "",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "disable_feature",
+                "v": "",
+                "vt": "num",
+                "t": "uint8"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "edu_robot/srv/SetMode",
+        "idltype": "",
+        "x": 410,
+        "y": 980,
+        "wires": [
+            [
+                "ad04af59bdf03abe"
+            ]
+        ]
+    },
+    {
+        "id": "fe7090f23b5049d9",
+        "type": "Service Client",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/set_mode",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "edu_robot/srv/SetMode",
+        "x": 860,
+        "y": 980,
+        "wires": [
+            [
+                "cfecf717ad6672ca"
+            ]
+        ]
+    },
+    {
+        "id": "cfecf717ad6672ca",
+        "type": "debug",
+        "z": "14b674bf0d2b6c61",
+        "name": "set mode response",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1110,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "ad04af59bdf03abe",
+        "type": "ROS2 Service Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "edu_robot",
+        "ros2service": "SetMode",
+        "x": 630,
+        "y": 980,
+        "wires": [
+            [
+                "fe7090f23b5049d9"
+            ]
+        ]
+    },
+    {
+        "id": "46f5f83524c35502",
+        "type": "comment",
+        "z": "14b674bf0d2b6c61",
+        "name": "Monitor",
+        "info": "",
+        "x": 170,
+        "y": 3260,
+        "wires": []
+    },
+    {
+        "id": "fa5cf554b9da03d3",
+        "type": "comment",
+        "z": "14b674bf0d2b6c61",
+        "name": "Distance",
+        "info": "",
+        "x": 180,
+        "y": 3300,
+        "wires": []
+    },
+    {
+        "id": "22560071cd9f9751",
+        "type": "comment",
+        "z": "14b674bf0d2b6c61",
+        "name": "Electrical",
+        "info": "",
+        "x": 180,
+        "y": 3880,
+        "wires": []
+    },
+    {
+        "id": "b44a3bd5958ed2c5",
+        "type": "comment",
+        "z": "14b674bf0d2b6c61",
+        "name": "Controll",
+        "info": "",
+        "x": 150,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "ff681aa18e03874a",
+        "type": "comment",
+        "z": "14b674bf0d2b6c61",
+        "name": "Drive",
+        "info": "",
+        "x": 150,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "aef888b49e1e75fb",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1080,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "5d460b635f5c59e8",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "geometry_msgs",
+        "ros2message": "Twist",
+        "x": 900,
+        "y": 1320,
+        "wires": [
+            [
+                "8b7a884c0cf6ac39"
+            ]
+        ]
+    },
+    {
+        "id": "8b7a884c0cf6ac39",
+        "type": "Publisher",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/autonomous/cmd_vel",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "geometry_msgs/msg/Twist",
+        "x": 1120,
+        "y": 1320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "81657a6c5a7257ac",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.0",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1140,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "13e5b6a9c7c83b70",
+        "type": "ui_template",
+        "z": "14b674bf0d2b6c61",
+        "group": "262d6637dcc34f10",
+        "name": "Drive Backward",
+        "order": 13,
+        "width": 2,
+        "height": 2,
+        "format": "<style>\n    .nr-dashboard-template {\n        padding: 0px;\n    }\n</style>\n<div class=\"momentary_back\">\n    <md-button style=\"width:100%; height:48px; margin: 0px\">\n        <i class=\"material-icons\">arrow_downward</i>\n</div>\n\n<script>\n    (function($scope) {\n    let interval;\n\n    function startSending() {\n        // Send immediately\n        $scope.send({\"payload\": true});\n        // Start interval to send every 20ms\n        interval = setInterval(function() {\n            $scope.send({\"payload\": true});\n        }, 20);\n    }\n\n    function stopSending() {\n        clearInterval(interval);\n        $scope.send({\"payload\": false});\n    }\n\n    $('.momentary_back').on('touchstart mousedown', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        startSending();\n    });\n\n    $('.momentary_back').on('touchend mouseup mouseleave', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        stopSending();\n    });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 200,
+        "y": 1240,
+        "wires": [
+            [
+                "3e4f2e07c87f0956"
+            ]
+        ]
+    },
+    {
+        "id": "3e4f2e07c87f0956",
+        "type": "switch",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 1240,
+        "wires": [
+            [
+                "1c758630446c63b6",
+                "6868fb8dc7eb01b5"
+            ],
+            [
+                "a06c0b2248ef6c49"
+            ]
+        ]
+    },
+    {
+        "id": "1c758630446c63b6",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "-0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1220,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "a06c0b2248ef6c49",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.0",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1280,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "1bd21908b2b92e49",
+        "type": "ui_template",
+        "z": "14b674bf0d2b6c61",
+        "group": "262d6637dcc34f10",
+        "name": "Drive Left",
+        "order": 8,
+        "width": 2,
+        "height": 2,
+        "format": "<style>\n    .nr-dashboard-template {\n        padding: 0px;\n}\n    }\n</style>\n<div class=\"momentary_left\">\n    <md-button style=\"width:100%; height:48px; margin: 0px\">\n        <i class=\"material-icons\">arrow_back</i>\n</div>\n\n<script>\n    (function($scope) {\n    let interval;\n\n    function startSending() {\n        // Send immediately\n        $scope.send({\"payload\": true});\n        // Start interval to send every 20ms\n        interval = setInterval(function() {\n            $scope.send({\"payload\": true});\n        }, 20);\n    }\n\n    function stopSending() {\n        clearInterval(interval);\n        $scope.send({\"payload\": false});\n    }\n\n    $('.momentary_left').on('touchstart mousedown', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        startSending();\n    });\n\n    $('.momentary_left').on('touchend mouseup mouseleave', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        stopSending();\n    });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 180,
+        "y": 1380,
+        "wires": [
+            [
+                "c3a5520b04cfe52f"
+            ]
+        ]
+    },
+    {
+        "id": "c3a5520b04cfe52f",
+        "type": "switch",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 1380,
+        "wires": [
+            [
+                "2fd85d05d421bdd6",
+                "6868fb8dc7eb01b5"
+            ],
+            [
+                "bb7aafaf9ddeedd6"
+            ]
+        ]
+    },
+    {
+        "id": "2fd85d05d421bdd6",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1360,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "bb7aafaf9ddeedd6",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.0",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1420,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "8827dfffa3de2449",
+        "type": "ui_template",
+        "z": "14b674bf0d2b6c61",
+        "group": "262d6637dcc34f10",
+        "name": "Drive Right",
+        "order": 10,
+        "width": 2,
+        "height": 2,
+        "format": "<style>\n    .nr-dashboard-template {\n        padding: 0px;\n        }\n    }\n</style>\n<div class=\"momentary_right\">\n    <md-button style=\"width:100%; height:48px; margin: 0px\">\n        <i class=\"material-icons\">arrow_forward</i>\n</div>\n\n<script>\n    (function($scope) {\n    let interval;\n\n    function startSending() {\n        // Send immediately\n        $scope.send({\"payload\": true});\n        // Start interval to send every 20ms\n        interval = setInterval(function() {\n            $scope.send({\"payload\": true});\n        }, 20);\n    }\n\n    function stopSending() {\n        clearInterval(interval);\n        $scope.send({\"payload\": false});\n    }\n\n    $('.momentary_right').on('touchstart mousedown', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        startSending();\n    });\n\n    $('.momentary_right').on('touchend mouseup mouseleave', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        stopSending();\n    });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 190,
+        "y": 1520,
+        "wires": [
+            [
+                "46d457f9ec1a8583"
+            ]
+        ]
+    },
+    {
+        "id": "46d457f9ec1a8583",
+        "type": "switch",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 1520,
+        "wires": [
+            [
+                "7002daf014683d9b",
+                "6868fb8dc7eb01b5"
+            ],
+            [
+                "7bf961402507499a"
+            ]
+        ]
+    },
+    {
+        "id": "7002daf014683d9b",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "-0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1500,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "7bf961402507499a",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.0",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1560,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "c125898355f97c59",
+        "type": "ui_template",
+        "z": "14b674bf0d2b6c61",
+        "group": "262d6637dcc34f10",
+        "name": "Drive Up Right",
+        "order": 5,
+        "width": 2,
+        "height": 2,
+        "format": "<style>\n    .nr-dashboard-template {\n        padding: 0px;\n        .momentary_upright i.material-icons {\n        transform: rotate(45deg);\n        }\n    }\n</style>\n<div class=\"momentary_upright\">\n    <md-button style=\"width:100%; height:48px; margin: 0px\">\n        <i class=\"material-icons\">arrow_upwards</i>\n</div>\n\n<script>\n    (function($scope) {\n    let interval;\n\n    function startSending() {\n        // Send immediately\n        $scope.send({\"payload\": true});\n        // Start interval to send every 20ms\n        interval = setInterval(function() {\n            $scope.send({\"payload\": true});\n        }, 20);\n    }\n\n    function stopSending() {\n        clearInterval(interval);\n        $scope.send({\"payload\": false});\n    }\n\n    $('.momentary_upright').on('touchstart mousedown', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        startSending();\n    });\n\n    $('.momentary_upright').on('touchend mouseup mouseleave', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        stopSending();\n    });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 200,
+        "y": 1660,
+        "wires": [
+            [
+                "9da444e3bf7a731a"
+            ]
+        ]
+    },
+    {
+        "id": "9da444e3bf7a731a",
+        "type": "switch",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 1660,
+        "wires": [
+            [
+                "b46ba4fe87a0e9c4",
+                "6868fb8dc7eb01b5"
+            ],
+            [
+                "db2946f21b79c6a0"
+            ]
+        ]
+    },
+    {
+        "id": "b46ba4fe87a0e9c4",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "-0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1640,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "db2946f21b79c6a0",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.0",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1700,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "935db318aa0a4416",
+        "type": "ui_template",
+        "z": "14b674bf0d2b6c61",
+        "group": "262d6637dcc34f10",
+        "name": "Drive Up Left",
+        "order": 3,
+        "width": 2,
+        "height": 2,
+        "format": "<style>\n    .nr-dashboard-template {\n        padding: 0px;\n        .momentary_upleft i.material-icons {\n        transform: rotate(45deg);\n        }\n    }\n</style>\n<div class=\"momentary_upleft\">\n    <md-button style=\"width:100%; height:48px; margin: 0px\">\n        <i class=\"material-icons\">arrow_back</i>\n</div>\n\n<script>\n    (function($scope) {\n    let interval;\n\n    function startSending() {\n        // Send immediately\n        $scope.send({\"payload\": true});\n        // Start interval to send every 20ms\n        interval = setInterval(function() {\n            $scope.send({\"payload\": true});\n        }, 20);\n    }\n\n    function stopSending() {\n        clearInterval(interval);\n        $scope.send({\"payload\": false});\n    }\n\n    $('.momentary_upleft').on('touchstart mousedown', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        startSending();\n    });\n\n    $('.momentary_upleft').on('touchend mouseup mouseleave', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        stopSending();\n    });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 190,
+        "y": 1800,
+        "wires": [
+            [
+                "d44444106aca41a7"
+            ]
+        ]
+    },
+    {
+        "id": "d44444106aca41a7",
+        "type": "switch",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 1800,
+        "wires": [
+            [
+                "41454d55ed0f5f67",
+                "6868fb8dc7eb01b5"
+            ],
+            [
+                "6304013c603ab5e4"
+            ]
+        ]
+    },
+    {
+        "id": "41454d55ed0f5f67",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1780,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "6304013c603ab5e4",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.0",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1840,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "f992102e77345688",
+        "type": "ui_template",
+        "z": "14b674bf0d2b6c61",
+        "group": "262d6637dcc34f10",
+        "name": "Drive Down Right",
+        "order": 17,
+        "width": 2,
+        "height": 2,
+        "format": "<style>\n    .nr-dashboard-template {\n        padding: 0px;\n        .momentary_downright i.material-icons {\n        transform: rotate(45deg);\n        }\n    }\n</style>\n<div class=\"momentary_downright\">\n    <md-button style=\"width:100%; height:48px; margin: 0px\">\n        <i class=\"material-icons\">arrow_forward</i>\n</div>\n\n<script>\n    (function($scope) {\n    let interval;\n\n    function startSending() {\n        // Send immediately\n        $scope.send({\"payload\": true});\n        // Start interval to send every 20ms\n        interval = setInterval(function() {\n            $scope.send({\"payload\": true});\n        }, 20);\n    }\n\n    function stopSending() {\n        clearInterval(interval);\n        $scope.send({\"payload\": false});\n    }\n\n    $('.momentary_downright').on('touchstart mousedown', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        startSending();\n    });\n\n    $('.momentary_downright').on('touchend mouseup mouseleave', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        stopSending();\n    });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 210,
+        "y": 1940,
+        "wires": [
+            [
+                "a419f8e9a071a930"
+            ]
+        ]
+    },
+    {
+        "id": "a419f8e9a071a930",
+        "type": "switch",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 1940,
+        "wires": [
+            [
+                "77530dd7e0724b8a",
+                "6868fb8dc7eb01b5"
+            ],
+            [
+                "034532dcce565138"
+            ]
+        ]
+    },
+    {
+        "id": "77530dd7e0724b8a",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "-0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "-0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1920,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "034532dcce565138",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.0",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 1980,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "c51b0527217f7a84",
+        "type": "ui_template",
+        "z": "14b674bf0d2b6c61",
+        "group": "262d6637dcc34f10",
+        "name": "Drive Down Left",
+        "order": 16,
+        "width": 2,
+        "height": 2,
+        "format": "<style>\n    .nr-dashboard-template {\n        padding: 0px;\n        .momentary_downleft i.material-icons {\n        transform: rotate(45deg);\n        }\n    }\n</style>\n<div class=\"momentary_downleft\">\n    <md-button style=\"width:100%; height:48px; margin: 0px\">\n        <i class=\"material-icons\">arrow_downward</i>\n</div>\n\n<script>\n    (function($scope) {\n    let interval;\n\n    function startSending() {\n        // Send immediately\n        $scope.send({\"payload\": true});\n        // Start interval to send every 20ms\n        interval = setInterval(function() {\n            $scope.send({\"payload\": true});\n        }, 20);\n    }\n\n    function stopSending() {\n        clearInterval(interval);\n        $scope.send({\"payload\": false});\n    }\n\n    $('.momentary_downleft').on('touchstart mousedown', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        startSending();\n    });\n\n    $('.momentary_downleft').on('touchend mouseup mouseleave', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        stopSending();\n    });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 200,
+        "y": 2080,
+        "wires": [
+            [
+                "661d83c8c4cb91c0"
+            ]
+        ]
+    },
+    {
+        "id": "661d83c8c4cb91c0",
+        "type": "switch",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 2080,
+        "wires": [
+            [
+                "31a2043a57c145d4",
+                "6868fb8dc7eb01b5"
+            ],
+            [
+                "8252aef7c52611ed"
+            ]
+        ]
+    },
+    {
+        "id": "31a2043a57c145d4",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "-0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "0.2",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 2060,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "8252aef7c52611ed",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.0",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 2120,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "0ec20140f4e8c8c9",
+        "type": "ui_template",
+        "z": "14b674bf0d2b6c61",
+        "group": "262d6637dcc34f10",
+        "name": "Turn Left",
+        "order": 2,
+        "width": 2,
+        "height": 2,
+        "format": "<style>\n    .nr-dashboard-template {\n        padding: 0px;\n        .momentary_turnleft i.material-icons {\n        transform: scaleX(-1);\n        }\n    }\n</style>\n<div class=\"momentary_turnleft\">\n    <md-button style=\"width:100%; height:48px; margin: 0px\">\n        <i class=\"material-icons\">refresh</i>\n</div>\n\n<script>\n    (function($scope) {\n    let interval;\n\n    function startSending() {\n        // Send immediately\n        $scope.send({\"payload\": true});\n        // Start interval to send every 20ms\n        interval = setInterval(function() {\n            $scope.send({\"payload\": true});\n        }, 20);\n    }\n\n    function stopSending() {\n        clearInterval(interval);\n        $scope.send({\"payload\": false});\n    }\n\n    $('.momentary_turnleft').on('touchstart mousedown', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        startSending();\n    });\n\n    $('.momentary_turnleft').on('touchend mouseup mouseleave', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        stopSending();\n    });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 180,
+        "y": 2220,
+        "wires": [
+            [
+                "32ac06a90caf6a0e"
+            ]
+        ]
+    },
+    {
+        "id": "32ac06a90caf6a0e",
+        "type": "switch",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 2220,
+        "wires": [
+            [
+                "da4fa3190773c72c",
+                "6868fb8dc7eb01b5"
+            ],
+            [
+                "739af7f73961338b"
+            ]
+        ]
+    },
+    {
+        "id": "da4fa3190773c72c",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "1",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 2200,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "739af7f73961338b",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.0",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 2260,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "f8fe6881958bcdef",
+        "type": "ui_template",
+        "z": "14b674bf0d2b6c61",
+        "group": "262d6637dcc34f10",
+        "name": "Turn Right",
+        "order": 6,
+        "width": 2,
+        "height": 2,
+        "format": "<style>\n    .nr-dashboard-template {\n        padding: 0px;\n        .momentary_turnright i.material-icons {\n        }\n    }\n</style>\n<div class=\"momentary_turnright\">\n    <md-button style=\"width:100%; height:48px; margin: 0px\">\n        <i class=\"material-icons\">refresh</i>\n</div>\n\n<script>\n    (function($scope) {\n    let interval;\n\n    function startSending() {\n        // Send immediately\n        $scope.send({\"payload\": true});\n        // Start interval to send every 20ms\n        interval = setInterval(function() {\n            $scope.send({\"payload\": true});\n        }, 20);\n    }\n\n    function stopSending() {\n        clearInterval(interval);\n        $scope.send({\"payload\": false});\n    }\n\n    $('.momentary_turnright').on('touchstart mousedown', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        startSending();\n    });\n\n    $('.momentary_turnright').on('touchend mouseup mouseleave', function(e) {\n        e.preventDefault(); // Prevent default behavior\n        stopSending();\n    });\n})(scope);\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 190,
+        "y": 2340,
+        "wires": [
+            [
+                "19c67d8d8f6d3c72"
+            ]
+        ]
+    },
+    {
+        "id": "19c67d8d8f6d3c72",
+        "type": "switch",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 2340,
+        "wires": [
+            [
+                "ad72dccb7f0d0c88",
+                "6868fb8dc7eb01b5"
+            ],
+            [
+                "cff879f5a2401a6b"
+            ]
+        ]
+    },
+    {
+        "id": "ad72dccb7f0d0c88",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "-1",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 590,
+        "y": 2320,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "cff879f5a2401a6b",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "linear.x",
+                "v": "0.0",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "linear.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.x",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.y",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            },
+            {
+                "p": "angular.z",
+                "v": "",
+                "vt": "num",
+                "t": "float64"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "geometry_msgs/msg/Twist",
+        "idltype": "",
+        "x": 610,
+        "y": 2400,
+        "wires": [
+            [
+                "5d460b635f5c59e8"
+            ]
+        ]
+    },
+    {
+        "id": "4db55fc2579b429a",
+        "type": "ui_button",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "b131bb0c8c3dd2bb",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Blink Left",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "left",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 180,
+        "y": 2560,
+        "wires": [
+            [
+                "382b5be838d0399f"
+            ]
+        ]
+    },
+    {
+        "id": "80ef05f6158f61ab",
+        "type": "Publisher",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/set_lighting_color",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "edu_robot/msg/SetLightingColor",
+        "x": 840,
+        "y": 2640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "21971823555c3a4d",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "lighting_name",
+                "v": "right_side",
+                "vt": "str",
+                "t": "string"
+            },
+            {
+                "p": "r",
+                "v": "255",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "g",
+                "v": "165",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "b",
+                "v": "0",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "brightness.data",
+                "v": "100",
+                "vt": "num",
+                "t": "float32"
+            },
+            {
+                "p": "mode",
+                "v": "2",
+                "vt": "num",
+                "t": "uint8"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "edu_robot/msg/SetLightingColor",
+        "idltype": "",
+        "x": 370,
+        "y": 2640,
+        "wires": [
+            [
+                "90c1335ebf4ae423"
+            ]
+        ]
+    },
+    {
+        "id": "90c1335ebf4ae423",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "edu_robot",
+        "ros2message": "SetLightingColor",
+        "x": 600,
+        "y": 2640,
+        "wires": [
+            [
+                "80ef05f6158f61ab"
+            ]
+        ]
+    },
+    {
+        "id": "05ba714cb2d6d8ac",
+        "type": "ui_button",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "b131bb0c8c3dd2bb",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Blink Right",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "right",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 190,
+        "y": 2640,
+        "wires": [
+            [
+                "21971823555c3a4d"
+            ]
+        ]
+    },
+    {
+        "id": "b846e4ed882d9ee4",
+        "type": "Publisher",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/set_lighting_color",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "edu_robot/msg/SetLightingColor",
+        "x": 840,
+        "y": 2720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3ff5282f26c3ca69",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "lighting_name",
+                "v": "all",
+                "vt": "str",
+                "t": "string"
+            },
+            {
+                "p": "r",
+                "v": "255",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "g",
+                "v": "165",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "b",
+                "v": "0",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "brightness.data",
+                "v": "100",
+                "vt": "num",
+                "t": "float32"
+            },
+            {
+                "p": "mode",
+                "v": "2",
+                "vt": "num",
+                "t": "uint8"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "edu_robot/msg/SetLightingColor",
+        "idltype": "",
+        "x": 370,
+        "y": 2720,
+        "wires": [
+            [
+                "05b7ccf5de6c85a6"
+            ]
+        ]
+    },
+    {
+        "id": "05b7ccf5de6c85a6",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "edu_robot",
+        "ros2message": "SetLightingColor",
+        "x": 600,
+        "y": 2720,
+        "wires": [
+            [
+                "b846e4ed882d9ee4"
+            ]
+        ]
+    },
+    {
+        "id": "3e01e2f0753e8879",
+        "type": "ui_button",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "b131bb0c8c3dd2bb",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Warn",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "Obacht ich komme",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 170,
+        "y": 2720,
+        "wires": [
+            [
+                "3ff5282f26c3ca69",
+                "64b5dc9b6e17d78b"
+            ]
+        ]
+    },
+    {
+        "id": "373459e093dfec40",
+        "type": "Publisher",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/set_lighting_color",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "edu_robot/msg/SetLightingColor",
+        "x": 840,
+        "y": 2800,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "afcd216223a72be4",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "lighting_name",
+                "v": "all",
+                "vt": "str",
+                "t": "string"
+            },
+            {
+                "p": "r",
+                "v": "255",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "g",
+                "v": "0",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "b",
+                "v": "0",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "brightness.data",
+                "v": "100",
+                "vt": "num",
+                "t": "float32"
+            },
+            {
+                "p": "mode",
+                "v": "5",
+                "vt": "num",
+                "t": "uint8"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "edu_robot/msg/SetLightingColor",
+        "idltype": "",
+        "x": 370,
+        "y": 2800,
+        "wires": [
+            [
+                "1bf0c883de0703d1"
+            ]
+        ]
+    },
+    {
+        "id": "1bf0c883de0703d1",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "edu_robot",
+        "ros2message": "SetLightingColor",
+        "x": 600,
+        "y": 2800,
+        "wires": [
+            [
+                "373459e093dfec40"
+            ]
+        ]
+    },
+    {
+        "id": "4d4bbe9fba29819b",
+        "type": "ui_button",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "b131bb0c8c3dd2bb",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Rotation",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "rotation",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 180,
+        "y": 2800,
+        "wires": [
+            [
+                "afcd216223a72be4"
+            ]
+        ]
+    },
+    {
+        "id": "835e175cf46e0e43",
+        "type": "Publisher",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/set_lighting_color",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "edu_robot/msg/SetLightingColor",
+        "x": 840,
+        "y": 2880,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8e19c20ce3b3c346",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "lighting_name",
+                "v": "all",
+                "vt": "str",
+                "t": "string"
+            },
+            {
+                "p": "r",
+                "v": "255",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "g",
+                "v": "0",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "b",
+                "v": "0",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "brightness.data",
+                "v": "100",
+                "vt": "num",
+                "t": "float32"
+            },
+            {
+                "p": "mode",
+                "v": "3",
+                "vt": "num",
+                "t": "uint8"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "edu_robot/msg/SetLightingColor",
+        "idltype": "",
+        "x": 370,
+        "y": 2880,
+        "wires": [
+            [
+                "6d5f0714c0d6d761"
+            ]
+        ]
+    },
+    {
+        "id": "6d5f0714c0d6d761",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "edu_robot",
+        "ros2message": "SetLightingColor",
+        "x": 600,
+        "y": 2880,
+        "wires": [
+            [
+                "835e175cf46e0e43"
+            ]
+        ]
+    },
+    {
+        "id": "90224bbb2b5a9e61",
+        "type": "ui_button",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "b131bb0c8c3dd2bb",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Pulsation",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "pulsation",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 180,
+        "y": 2880,
+        "wires": [
+            [
+                "8e19c20ce3b3c346"
+            ]
+        ]
+    },
+    {
+        "id": "62cecf8c15fead24",
+        "type": "Publisher",
+        "z": "14b674bf0d2b6c61",
+        "topic": "/eduard/green/set_lighting_color",
+        "domain": "ad699d6c816973cf",
+        "props": [],
+        "selectedtype": "edu_robot/msg/SetLightingColor",
+        "x": 840,
+        "y": 2960,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bb24f7e1a2a388e4",
+        "type": "ROS2 Inject",
+        "z": "14b674bf0d2b6c61",
+        "types": [],
+        "props": [
+            {
+                "p": "lighting_name",
+                "v": "all",
+                "vt": "str",
+                "t": "string"
+            },
+            {
+                "p": "r",
+                "v": "255",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "g",
+                "v": "0",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "b",
+                "v": "0",
+                "vt": "num",
+                "t": "uint8"
+            },
+            {
+                "p": "brightness.data",
+                "v": "100",
+                "vt": "num",
+                "t": "float32"
+            },
+            {
+                "p": "mode",
+                "v": "1",
+                "vt": "num",
+                "t": "uint8"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "ros2type": "edu_robot/msg/SetLightingColor",
+        "idltype": "",
+        "x": 370,
+        "y": 2960,
+        "wires": [
+            [
+                "27b4991fb35a33e9"
+            ]
+        ]
+    },
+    {
+        "id": "27b4991fb35a33e9",
+        "type": "ROS2 Type",
+        "z": "14b674bf0d2b6c61",
+        "ros2pkg": "edu_robot",
+        "ros2message": "SetLightingColor",
+        "x": 600,
+        "y": 2960,
+        "wires": [
+            [
+                "62cecf8c15fead24"
+            ]
+        ]
+    },
+    {
+        "id": "3beb852d853e3387",
+        "type": "ui_button",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "b131bb0c8c3dd2bb",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "High Beam",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "high",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 190,
+        "y": 2960,
+        "wires": [
+            [
+                "bb24f7e1a2a388e4"
+            ]
+        ]
+    },
+    {
+        "id": "ef9558f8f0c32595",
+        "type": "comment",
+        "z": "14b674bf0d2b6c61",
+        "name": "Don't hit the wall example",
+        "info": "",
+        "x": 150,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "64b5dc9b6e17d78b",
+        "type": "ui_audio",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "4096a1cadf804d6e",
+        "voice": "Microsoft Hedda - German (Germany)",
+        "always": "",
+        "x": 1060,
+        "y": 2660,
+        "wires": []
+    },
+    {
+        "id": "04d366af11f97296",
+        "type": "ui_slider",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "label": "slider",
+        "tooltip": "",
+        "group": "4096a1cadf804d6e",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "all",
+        "topic": "topic",
+        "topicType": "msg",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "className": "",
+        "x": 510,
+        "y": 680,
+        "wires": [
+            [
+                "e56834630a9629d3"
+            ]
+        ]
+    },
+    {
+        "id": "e56834630a9629d3",
+        "type": "ui_chart",
+        "z": "14b674bf0d2b6c61",
+        "name": "",
+        "group": "4096a1cadf804d6e",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "label": "chart",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 730,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bb94361f74b0f6a6",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 1,
+        "width": 10,
+        "height": 1
+    },
+    {
+        "id": "791f0023da1d969b",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 7,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "0ea0346ff018663a",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 9,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "d282c2c543f5897d",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 11,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "ecc6f0d8f4ca0b12",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 12,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "d2993f08e916eddf",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 14,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "ac67d52a78096d7f",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 15,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "d4efe8f86a8b2a31",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 18,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "971b32809e3fb468",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 19,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "22f163673b405033",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 20,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "c3b901db6c48d31f",
+        "type": "ui_spacer",
+        "z": "14b674bf0d2b6c61",
+        "name": "spacer",
+        "group": "262d6637dcc34f10",
+        "order": 21,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "ad699d6c816973cf",
+        "type": "dds-settings",
+        "domain": "0"
+    },
+    {
+        "id": "d39c279380872ec6",
+        "type": "ui_group",
+        "name": "Distance",
+        "tab": "f922289102531b8a",
+        "order": 1,
+        "disp": true,
+        "width": 8,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "77fafff1fd7418ce",
+        "type": "ui_group",
+        "name": "Voltage",
+        "tab": "f922289102531b8a",
+        "order": 1,
+        "disp": true,
+        "width": 8,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4096a1cadf804d6e",
+        "type": "ui_group",
+        "name": "Standard",
+        "tab": "7c827bd862ed7a54",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "262d6637dcc34f10",
+        "type": "ui_group",
+        "name": "Joy-Stick",
+        "tab": "7c827bd862ed7a54",
+        "order": 2,
+        "disp": true,
+        "width": 10,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b131bb0c8c3dd2bb",
+        "type": "ui_group",
+        "name": "Lights",
+        "tab": "7c827bd862ed7a54",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f922289102531b8a",
+        "type": "ui_tab",
+        "name": "Sensors",
+        "icon": "dashboard",
+        "order": 3,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "7c827bd862ed7a54",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
