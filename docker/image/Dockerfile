@@ -50,11 +50,9 @@ RUN apt-get update \
         libssl-dev \
         libwebsocketpp-dev \
         libyaml-cpp-dev \
-        python3-pip \
-        wget && \
-    pip3 install -U \
-        colcon-common-extensions \
-        vcstool \
+        wget \
+        python3-colcon-common-extensions \
+        python3-vcstool \
     && curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.bash && \
     chmod +x nodesource_setup.bash && \
     bash -c ./nodesource_setup.bash && \
