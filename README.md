@@ -165,7 +165,7 @@ The associated dialogs are populated with the linked type fields and types. For 
 
 #### ROS2 nodes: General Settings
 
-In order to interact with a ROS2 environment we must specify the same [domain id](https://docs.ros.org/en/humble/Concepts/About-Domain-ID.html)
+In order to interact with a ROS2 environment we must specify the same [domain id](https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Domain-ID.html)
 in use for that environment.
 
 The *domain id* is a number in the range `[0, 166]` that provides isolation for ROS2 nodes.
@@ -174,21 +174,21 @@ speeding things up.
 
 Another key concepts in the ROS2 environment are:
 
-- [topic](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html)
+- [topic](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html)
 one. A *topic* is a text string ROS2 nodes use to notify all other nodes in which data they are interested.
 When a ROS2 node wants to send or receive data it must specify:
  + Which type is the data they want receive. For example the `edu_robot/RobotStatusReport` we introduced [above](#choosing-a-predefined-ros2-type).
  + Topic associated with the data. For example `/status_report`, but in ROS2 topics are often *decorated* using
 namespaces to simplify identification, as in `/eduard/red/status_report`.
 
-- [Quality of Service (QoS)](https://docs.ros.org/en/humble/Concepts/About-Quality-of-Service-Settings.html). Those are
+- [Quality of Service (QoS)](https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Quality-of-Service-Settings.html). Those are
   policies that allow fine tunning of the communication between nodes. For example:
   + *History QoS* allows to discard messages if only the most recent one is meaningful for our purposes.
   + *Reliable QoS* enforces message reception by resending it until the receiver acknowledges it.
   + *Durability QoS* assures messages published before the receiver node creation would be delivered.
 
 > **_Note:_** ROS2 nodes can only communicate if their respective QoS are compatible. Information on QoS compatibility
-  is available [here](https://docs.ros.org/en/humble/Concepts/About-Quality-of-Service-Settings.html#qos-compatibilities).
+  is available [here](https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Quality-of-Service-Settings.html).
 
 #### ROS2 Subscriber
 
