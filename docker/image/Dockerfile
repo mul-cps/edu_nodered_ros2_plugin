@@ -1,5 +1,5 @@
-ARG ROS_DISTRO=humble
-FROM eduartrobotik/eduart-robot:0.4.1
+ARG ROS_DISTRO=jazzy
+FROM eduartrobotik/eduart-robot:0.5.0
 
 # Avoid interactuation with installation of some package that needs the locale.
 USER root
@@ -58,7 +58,7 @@ RUN apt-get update \
     && curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.bash && \
     chmod +x nodesource_setup.bash && \
     bash -c ./nodesource_setup.bash && \
-    apt-get install -y nodejs ros-humble-turtlesim
+    apt-get install -y nodejs ros-jazzy-turtlesim
 
 # Install Node-RED and node-red-ros2-plugin
 RUN source /opt/ros/$ROS_DISTRO/setup.bash \
