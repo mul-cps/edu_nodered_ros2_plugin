@@ -1,0 +1,19 @@
+services:
+    eduart-node-red:
+        user: user
+        image: eduartrobotik/eduart-nodered:0.3.0
+        network_mode: host
+        command: node-red --userDir /data
+        restart: always
+        privileged: true
+        ipc: host
+        pid: host
+        environment:
+            - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}
+            - CYCLONEDDS_URI=/home/user/ros/launch_content/cyclone_profile.xml   
+        volumes:
+            - node_red_user_data:/data:rw
+            - './launch_content:/home/user/ros/launch_content:r'
+
+volumes:
+    node_red_user_data:
