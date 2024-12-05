@@ -4,6 +4,9 @@
 
 This project is started as an fork of [node-red-ros2-plugin](https://github.com/eProsima/node-red-ros2-plugin) from eProsima. We removed the [Integration Service](https://integration-service.docs.eprosima.com/en/latest/) and added ROS service client and ROS action client using the Java Script ROS API, [rclnodejs](https://github.com/RobotWebTools/rclnodejs).
 
+|<img src='docs/warning.png' height='100' width='400'/>   |    Version 0.3.x of edu_nodered_ros2_plugin switches its ROS2 middleware from FastRTPS (the ROS2 default) to Cyclone DDS! This change is important because these two middlewares are not fully compatible. Therefore, if you update to version 0.3.x you have to make your sure that your whole ROS2 infrastructure uses the same middleware!    <br> <br>    If you wish to keep FastRTPS as your middleware, you can do this by simply editing a parameter file. Please refer to [this guide](https://github.com/EduArt-Robotik/edu_robot/blob/main/documentation/update/changing-middleware.md) (repository: edu_robot) on how to adjust the middleware settings for the docker containers and your system! |
+|---|----|
+
 ## Installation
 
 ### Checking if Node-Red is already Installed
