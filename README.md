@@ -92,7 +92,7 @@ cd edu_nodered_ros2_plugin/docker/
 Now the new version can be started by the command: 
 
 ```bash
-docker compose up
+docker compose -p docker up
 ```
 
 The container will be stopped and the new pulled and started.
