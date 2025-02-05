@@ -53,16 +53,16 @@ The plugin comes with a Node-Red installation deployed in a Docker image. This m
 git clone https://github.com/EduArt-Robotik/edu_nodered_ros2_plugin.git 
 ```
 
-Go inside the docker folder where the compose file is located:
+Go inside the docker folder where the compose file is located. Replace the `<hardware>` with your specific hardware (e.g. iot2050):
 
 ```bash
-cd edu_nodered_ros2_plugin/docker/ 
+cd edu_nodered_ros2_plugin/docker/<hardware>/
 ```
 
 Then execute the command:
 
 ```bash
-docker compose up
+docker compose -p docker up
 ```
 
 The Node-Red web server will start up. The docker container will be autostart after a reboot or if an error occurred.
