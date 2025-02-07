@@ -83,10 +83,10 @@ The output will tell you if there is a new version of the code.
 
 #### Update
 
-Don't worry previously performed work in Node-Red will be preserved as the data is stored outside the Docker container. First remove current version. Go into the folder where the docker compose file is located: 
+Don't worry previously performed work in Node-Red will be preserved as the data is stored outside the Docker container. First remove current version. Go into the folder where the docker compose file is located (if you are using another plattform than the IOT2050 you might have to change to "rapberry"): 
 
 ```bash
-cd edu_nodered_ros2_plugin/docker/ 
+cd edu_nodered_ros2_plugin/docker/iot2050/ 
 ```
 
 Now the new version can be started by the command: 
