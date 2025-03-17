@@ -1,7 +1,7 @@
 # ARG ROS_DISTRO=jazzy
 #FROM eduartrobotik/eduart-robot:0.5.0
 ARG ROS_DISTRO=humble
-FROM osrf/ros:${ROS_DISTRO}
+FROM osrf/ros:${ROS_DISTRO}-simulation
 
 # Avoid interactuation with installation of some package that needs the locale.
 USER root
