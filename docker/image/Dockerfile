@@ -1,5 +1,7 @@
-ARG ROS_DISTRO=jazzy
-FROM eduartrobotik/eduart-robot:0.5.0
+# ARG ROS_DISTRO=jazzy
+#FROM eduartrobotik/eduart-robot:0.5.0
+ARG ROS_DISTRO=humble
+FROM osrf/ros:${ROS_DISTRO}
 
 # Avoid interactuation with installation of some package that needs the locale.
 USER root
@@ -69,7 +71,7 @@ RUN source /opt/ros/$ROS_DISTRO/setup.bash \
         cron
 
 # Coping and Installing ROS2 Plugin
-COPY ./edu_nodered_ros2_plugin /home/user/edu_nodered_ros2_plugin
+COPY . /home/user/edu_nodered_ros2_plugin
 RUN echo "installing plugins" \
     # instlling dashboad
     && npm install -g node-red-dashboard \
