@@ -99,7 +99,7 @@
 ARG ROS_DISTRO=humble
 FROM osrf/ros:${ROS_DISTRO}-simulation
 # Redeclare ARG after FROM to use it later in the Dockerfile
-ARG ROS_DISTRO
+ARG ROS_DISTRO=humble
 
 USER root
 ENV TZ=Europe/Berlin
