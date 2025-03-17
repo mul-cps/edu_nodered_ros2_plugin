@@ -125,13 +125,16 @@ RUN apt-get update \
 
 # Install Node-RED and ROS2 integration
 RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
-    source /home/user/ros/install/setup.bash && \
+    npm install -g --unsafe-perm rimraf && \
     npm install -g --unsafe-perm node-red rclnodejs cron
+# RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
+#     #source /home/user/ros/install/setup.bash && \
+#     npm install -g --unsafe-perm node-red rclnodejs cron
 
 # Copy and install custom Node-RED plugin
 RUN mkdir -p /home/user/edu_nodered_ros2_plugin
 COPY . /home/user/edu_nodered_ros2_plugin
-RUN npm install -g ./edu_nodered_ros2_plugin
+RUN npm install -g /home/user/edu_nodered_ros2_plugin
 
 # Create persistent storage for flow data
 RUN mkdir -p /data && chmod a+w /data
