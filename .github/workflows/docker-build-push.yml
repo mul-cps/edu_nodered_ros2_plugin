@@ -3,7 +3,10 @@ name: Docker Compose Build and Push Workflow
 on:
   push:
     branches:
-      - master  # Change this to your main branch name
+      - master  # Runs when pushing to master
+  pull_request:
+    branches:
+      - master  # Runs when a PR is opened against master
 
 jobs:
   build:
@@ -29,7 +32,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v6
       with:
-        push: true
+        push: ${{ github.event_name != 'pull_request' }}  # Only push on push events
         tags: |
           ghcr.io/user/app:latest
           ghcr.io/user/app:${{ env.sha_tag }}
