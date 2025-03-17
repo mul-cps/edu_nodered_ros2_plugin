@@ -90,6 +90,7 @@ WORKDIR /
 COPY docker/image/entrypoint.bash .
 RUN chmod +x /entrypoint.bash
 
+ENV ROS_DISTRO=${ROS_DISTRO}
 # CMD [ "node", "/usr/bin/node-red" ]
 CMD /usr/bin/node-red
 ENTRYPOINT [ "/entrypoint.bash" ]
