@@ -87,7 +87,7 @@ RUN echo "creating storage for flow data" \
 
 # Enable overlay execution
 WORKDIR /
-COPY ./entrypoint.bash .
+COPY docker/image/entrypoint.bash .
 RUN chmod +x /entrypoint.bash
 
 # CMD [ "node", "/usr/bin/node-red" ]
