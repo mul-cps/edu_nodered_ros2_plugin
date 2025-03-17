@@ -58,7 +58,7 @@ RUN apt-get update \
     && curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.bash && \
     chmod +x nodesource_setup.bash && \
     bash -c ./nodesource_setup.bash && \
-    apt-get install -y nodejs ros-jazzy-turtlesim
+    apt-get install -y nodejs ros-${ROS_DISTRO}-turtlesim
 
 # Install Node-RED and node-red-ros2-plugin
 RUN source /opt/ros/$ROS_DISTRO/setup.bash \
